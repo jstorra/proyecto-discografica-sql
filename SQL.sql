@@ -26,8 +26,9 @@ CREATE TABLE genero_artista_compositor (
 );
 
 CREATE TABLE telefonosPersona (
-  telefono VARCHAR(20),
-  persona_id INT NOT NULL
+  telefono VARCHAR(20) NOT NULL,
+  persona_id INT NOT NULL,
+  PRIMARY KEY (telefono, persona_id)
 );
 
 CREATE TABLE albumes (
@@ -109,8 +110,6 @@ ALTER TABLE personas ADD CONSTRAINT UC_Personas_NombreArtistico UNIQUE (nombreAr
 ALTER TABLE personas ADD CONSTRAINT UC_Personas_Telefono UNIQUE (telefonoPrincipal);
 
 ALTER TABLE generos ADD CONSTRAINT UC_Generos_Nombre UNIQUE (nombre);
-
-ALTER TABLE telefonosPersona ADD CONSTRAINT UC_TelefonosPersona_telefono UNIQUE (telefono);
 
 ALTER TABLE albumes ADD CONSTRAINT UC_Albumes_Titulo UNIQUE (titulo);
 
