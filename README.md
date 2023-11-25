@@ -18,13 +18,21 @@ Tener instalado un gestor de base de datos, preferiblemente **MySQL**, es fundam
 
 Una reconocida discográfica ha decidido modernizar su sistema de gestión para optimizar el manejo de la información sobre artistas, compositores, álbumes, canciones, estudios de grabación, ingenieros de sonido, fechas de lanzamiento, ventas y giras. La discográfica desea un sistema que le permita organizar eficientemente sus operaciones diarias, incluyendo el seguimiento de la producción musical, la gestión de eventos de lanzamiento, el control de ventas y el manejo de giras de artistas.
 
+Las personas registradas en el sistema, ya sea de tipo **artista**, **compositor** o **ingeniero**, pueden tener muchas especializaciones, por lo que se deberá llevar un registro de estas. Además, un **artista** o **compositor** pueden abordar distintos tipos de géneros musicales y la discográfica desea almacenar esa información.
+
+Se desea manejar el sistema de forma en la que pueden existir varias canciones de un único artista con su correspondiente compositor; estas canciones pertenecen específicamente a un álbum, ya que no se pretende, por el momento, realizar álbumes de mejores canciones con canciones de diferentes álbumes. Los álbumes tienen su correspondiente ingreso generado de venta, el cual es dividido por día de venta. Es decir, se genera un registro diario de los ingresos obtenidos por ese día.
+
+Debemos tener en cuenta que pueden existir álbumes remasterizados o de ediciones especiales, por lo que debemos llevar un registro de los álbumes que fueron relanzados y su respectivo tipo de relanzamiento. Además, cada álbum puede tener distintos tipos de formatos para su lanzamiento.
+
+Para finalizar, la discográfica requiere llevar el registro de las giras de un artista, especificando su fecha de inicio, fecha de fin en caso de ya estar estipulada y los países en los que se llevará a cabo la misma.
+
 ## Requisitos Funcionales
 
 1. **Registro de Artistas:**
-   - Almacenar información detallada sobre los artistas, incluyendo nombre, apellidos, nombre artístico, país de origen y año de inicio en la industria.
+   - Almacenar información detallada sobre los artistas, incluyendo nombre, apellidos, nombre artístico, país de origen, año de inicio en la industria, etc.
 
 2. **Registro de Compositores:**
-   - Almacenar información detallada sobre los compositores, incluyendo nombre, apellidos, país de origen y año de inicio en la industria.
+   - Almacenar información detallada sobre los compositores, incluyendo nombre, apellidos, país de origen, año de inicio en la industria, etc.
 
 3. **Catálogo de Álbumes y Canciones:**
    - Mantener un catálogo completo de álbumes, con detalles como título, fecha de lanzamiento y formato.
@@ -32,7 +40,7 @@ Una reconocida discográfica ha decidido modernizar su sistema de gestión para 
 
 4. **Estudios de Grabación e Ingenieros de Sonido:**
    - Gestionar la información de los estudios de grabación, incluyendo nombre, ubicación y año de fundación.
-   - Registrar los ingenieros de sonido asociados a cada estudio, con detalles sobre su nombre, apellidos y especialización.
+   - Registrar los ingenieros de sonido asociados a cada estudio, con detalles sobre su nombre, apellidos, año de inicio en la carrera, etc.
 
 5. **Fechas de Lanzamiento y Ventas:**
    - Seguir las fechas de lanzamiento y relanzamiento de álbumes.
@@ -49,6 +57,7 @@ Una reconocida discográfica ha decidido modernizar su sistema de gestión para 
 - Un artista puede abordar diferentes géneros musicales.
 - Un compositor puede abordar diferentes géneros musicales.
 - Una persona puede tener uno o más teléfonos de contacto.
+- Una persona puede tener una o muchas especializaciones.
 
 ### Estudios de grabación
 
