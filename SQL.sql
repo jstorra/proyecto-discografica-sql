@@ -1,3 +1,10 @@
+CREATE TABLE estudios (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL,
+  ubicacion VARCHAR(50) NOT NULL,
+  fechaFundacion DATE NOT NULL
+);
+
 CREATE TABLE personas (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   sexo ENUM('H','M') NOT NULL,
@@ -6,7 +13,6 @@ CREATE TABLE personas (
   apellido1 VARCHAR(20) NOT NULL,
   apellido2 VARCHAR(20),
   nombreArtistico VARCHAR(20),
-  especializacion VARCHAR(50),
   telefonoPrincipal VARCHAR(20) NOT NULL,
   paisOrigen VARCHAR(20) NOT NULL,
   fechaNacimiento DATE NOT NULL,
@@ -23,6 +29,17 @@ CREATE TABLE genero_artista_compositor (
   persona_id INT NOT NULL,
   genero_id INT NOT NULL,
   PRIMARY KEY (persona_id, genero_id)
+);
+
+CREATE TABLE especializaciones (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE especializacion_persona (
+  especializacion_id INT NOT NULL,
+  persona_id INT NOT NULL,
+  PRIMARY KEY (especializacion_id, persona_id)
 );
 
 CREATE TABLE telefonosPersona (
@@ -56,13 +73,6 @@ CREATE TABLE canciones (
   letra TEXT NOT NULL,
   album_id INT NOT NULL,
   compositor_id INT NOT NULL
-);
-
-CREATE TABLE estudios (
-  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(50) NOT NULL,
-  ubicacion VARCHAR(50) NOT NULL,
-  fechaFundacion DATE NOT NULL
 );
 
 CREATE TABLE relanzamientos (
@@ -111,6 +121,8 @@ ALTER TABLE personas ADD CONSTRAINT UC_Personas_Telefono UNIQUE (telefonoPrincip
 
 ALTER TABLE generos ADD CONSTRAINT UC_Generos_Nombre UNIQUE (nombre);
 
+ALTER TABLE especializaciones ADD CONSTRAINT UC_Especializaciones_Nombre UNIQUE (nombre);
+
 ALTER TABLE albumes ADD CONSTRAINT UC_Albumes_Titulo UNIQUE (titulo);
 
 ALTER TABLE formatos ADD CONSTRAINT UC_Formatos_Nombre UNIQUE (nombre);
@@ -132,6 +144,9 @@ ALTER TABLE personas ADD CONSTRAINT FK_Personas_Estudio_id FOREIGN KEY (estudio_
 
 ALTER TABLE genero_artista_compositor ADD CONSTRAINT FK_Genero_artista_compositor_Persona_id FOREIGN KEY (persona_id) REFERENCES personas (id);
 ALTER TABLE genero_artista_compositor ADD CONSTRAINT FK_Genero_artista_compositor_Genero_id FOREIGN KEY (genero_id) REFERENCES generos (id);
+
+ALTER TABLE especializacion_persona ADD CONSTRAINT FK_Especializacion_persona_Especializacion_id FOREIGN KEY (especializacion_id) REFERENCES especializaciones (id);
+ALTER TABLE especializacion_persona ADD CONSTRAINT FK_Especializacion_persona_Persona_id FOREIGN KEY (persona_id) REFERENCES personas (id);
 
 ALTER TABLE telefonosPersona ADD CONSTRAINT FK_TelefonosPersona_Persona_id FOREIGN KEY (persona_id) REFERENCES personas (id);
 
