@@ -1,25 +1,48 @@
+DELETE FROM estudios;
+INSERT INTO estudios (nombre, ubicacion, fechaFundacion) VALUES
+('Estudio Sonic', 'Los Angeles, CA', '2000-05-15'),
+('SoundLab Studios', 'Nashville, TN', '1998-11-23'),
+('Harmony Studios', 'London, UK', '2005-08-10'),
+('Pulse Recording', 'New York, NY', '2003-04-30'),
+('Golden Ear Studios', 'Berlin, Germany', '1995-07-18'),
+('Echo Sound Works', 'Tokyo, Japan', '2008-02-14'),
+('Melody Studios', 'Sydney, Australia', '1990-09-05'),
+('Metro Sound Productions', 'Toronto, Canada', '1997-12-12'),
+('Euphony Studios', 'Paris, France', '2001-06-28'),
+('Rhythm Room Studios', 'Austin, TX', '1993-03-08'),
+('Mystic Sound Studios', 'Stockholm, Sweden', '2007-10-03'),
+('Fusion Studios', 'São Paulo, Brazil', '1992-01-20'),
+('Celestial Soundscapes', 'Cape Town, South Africa', '2004-09-17'),
+('Pacific Sound Studios', 'Vancouver, Canada', '1999-06-25'),
+('Epicenter Productions', 'Moscow, Russia', '2006-12-07'),
+('Astral Audio Studios', 'Buenos Aires, Argentina', '1996-04-14'),
+('Zenith Studios', 'Seoul, South Korea', '2010-03-22'),
+('Virtuoso Studios', 'Vienna, Austria', '1994-08-31'),
+('Harmonic Heights', 'Mumbai, India', '2009-01-12'),
+('Crescendo Studios', 'Mexico City, Mexico', '1991-07-02');
+
 DELETE FROM personas;
-INSERT INTO personas (sexo, tipo, nombre, apellido1, apellido2, nombreArtistico, especializacion, telefonoPrincipal, paisOrigen, fechaNacimiento, anyoInicioCarrera, estudio_id) VALUES
-('H', 'artista', 'Juan', 'Perez', 'Gomez', 'Juanito', 'Pintura', '+1 555-987-6543', 'España', '1990-01-15', 2010, 1),
-('M', 'compositor', 'Ana', 'Lopez', 'Garcia', NULL, 'Música clásica', '+44 20 7946 2154', 'Argentina', '1985-05-20', 2005, 2),
-('H', 'ingeniero', 'Carlos', 'Gonzalez', 'Fernandez', NULL, 'Ingeniería eléctrica', '+33 1 45 67 89 21', 'México', '1982-11-10', 2002, 3),
-('M', 'artista', 'Elena', 'Martinez', 'Ruiz', 'Elenita', 'Escultura', '+49 30 87654321', 'Colombia', '1995-03-08', 2015, 1),
-('H', 'compositor', 'Javier', 'Sanchez', 'Lopez', NULL, 'Música pop', '+81 3-5678-9012', 'Perú', '1978-07-25', 1998, 2),
-('M', 'ingeniero', 'Laura', 'Diaz', 'Gutierrez', NULL, 'Ingeniería civil', '+39 02 3456 7890', 'Chile', '1980-09-18', 2000, 3),
-('H', 'artista', 'Miguel', 'Rodriguez', 'Fernandez', 'Miguelito', 'Fotografía', '+34 91 234 56 78', 'Uruguay', '1987-12-03', 2007, 1),
-('M', 'compositor', 'Isabel', 'Lopez', 'Perez', NULL, 'Música electrónica', '+86 10 5678 1234', 'Brasil', '1992-06-30', 2012, 2),
-('H', 'ingeniero', 'Roberto', 'Gomez', 'Hernandez', NULL, 'Ingeniería mecánica', '+61 2 3456 7890', 'Ecuador', '1984-04-12', 2004, 3),
-('M', 'artista', 'Sofia', 'Garcia', 'Martinez', 'Sof', 'Danza', '+7 495 987-654-32', 'Venezuela', '1998-02-22', 2018, 1),
-('H', 'artista', 'Luis', 'Fernandez', NULL, 'Lucho', 'Escultura', '+52 55 7890 1234', 'Argentina', '1993-08-10', 2013, 2),
-('M', 'compositor', 'Carmen', 'Gutierrez', 'Lopez', NULL, NULL, '+1 416-555-5678', 'México', '1989-04-05', 2009, 3),
-('H', 'ingeniero', 'Raúl', 'Hernandez', 'Diaz', NULL, 'Ingeniería eléctrica', '+33 1 23 45 67 98', 'Canadá', '1981-12-18', 2001, 1),
-('M', 'artista', 'Pedro', 'Martinez', 'Fernandez', 'Pedrito', 'Pintura', '+49 40 12345678', 'Colombia', '1997-07-12', 2017, 2),
-('H', 'compositor', 'Ana', 'Hernandez', 'Perez', NULL, 'Música clásica', '+81 90-1234-5678', 'España', '1983-04-25', 2003, 3),
-('M', 'ingeniero', 'Diego', 'Gomez', 'Rodriguez', NULL, 'Ingeniería civil', '+39 06 1234 5678', 'Chile', '1986-11-30', 2006, 1),
-('H', 'artista', 'Marina', 'Sanchez', 'Lopez', 'Marinita', 'Fotografía', '+34 93 123 45 67', 'Perú', '1990-02-15', 2010, 2),
-('M', 'compositor', 'Alejandro', 'Perez', 'Gutierrez', NULL, 'Música pop', '+86 21 1234 5678', 'Brasil', '1980-08-08', 2000, 3),
-('H', 'ingeniero', 'Julio', 'Gutierrez', 'Fernandez', NULL, 'Ingeniería mecánica', '+61 3 2345 6789', 'Venezuela', '1989-06-03', 2009, 1),
-('M', 'artista', 'Camila', 'Martinez', 'Ruiz', 'Cami', 'Danza', '+7 812 123-45-67', 'Ecuador', '1995-03-22', 2015, 2);
+INSERT INTO personas (sexo, tipo, nombre, apellido1, apellido2, nombreArtistico, telefonoPrincipal, paisOrigen, fechaNacimiento, anyoInicioCarrera, estudio_id) VALUES
+('H', 'artista', 'Juan', 'Perez', 'Gomez', 'Juanito', '+1 555-987-6543', 'España', '1990-01-15', 2010, 1),
+('M', 'compositor', 'Ana', 'Lopez', 'Garcia', NULL, '+44 20 7946 2154', 'Argentina', '1985-05-20', 2005, 2),
+('H', 'ingeniero', 'Carlos', 'Gonzalez', 'Fernandez', NULL, '+33 1 45 67 89 21', 'México', '1982-11-10', 2002, 3),
+('M', 'artista', 'Elena', 'Martinez', 'Ruiz', 'Elenita', '+49 30 87654321', 'Colombia', '1995-03-08', 2015, 3),
+('H', 'compositor', 'Javier', 'Sanchez', 'Lopez', NULL, '+81 3-5678-9012', 'Perú', '1978-07-25', 1998, 4),
+('M', 'ingeniero', 'Laura', 'Diaz', 'Gutierrez', NULL, '+39 02 3456 7890', 'Chile', '1980-09-18', 2000, 5),
+('H', 'artista', 'Miguel', 'Rodriguez', 'Fernandez', 'Miguelito', '+34 91 234 56 78', 'Uruguay', '1987-12-03', 2007, 6),
+('M', 'compositor', 'Isabel', 'Lopez', 'Perez', NULL, '+86 10 5678 1234', 'Brasil', '1992-06-30', 2012, 7),
+('H', 'ingeniero', 'Roberto', 'Gomez', 'Hernandez', NULL, '+61 2 3456 7890', 'Ecuador', '1984-04-12', 2004, 7),
+('M', 'artista', 'Sofia', 'Garcia', 'Martinez', 'Sof', '+7 495 987-654-32', 'Venezuela', '1998-02-22', 2018, 8),
+('H', 'artista', 'Luis', 'Fernandez', NULL, 'Lucho', '+52 55 7890 1234', 'Argentina', '1993-08-10', 2013, 9),
+('M', 'compositor', 'Carmen', 'Gutierrez', 'Lopez', NULL, NULL, '+1 416-555-5678', 'México', '1989-04-05', 2009, 10),
+('H', 'ingeniero', 'Raúl', 'Hernandez', 'Diaz', NULL, '+33 1 23 45 67 98', 'Canadá', '1981-12-18', 2001, 10),
+('M', 'artista', 'Pedro', 'Martinez', 'Fernandez', 'Pedrito', '+49 40 12345678', 'Colombia', '1997-07-12', 2017, 11),
+('H', 'compositor', 'Ana', 'Hernandez', 'Perez', NULL, '+81 90-1234-5678', 'España', '1983-04-25', 2003, 12),
+('M', 'ingeniero', 'Diego', 'Gomez', 'Rodriguez', NULL, '+39 06 1234 5678', 'Chile', '1986-11-30', 2006, 13),
+('H', 'artista', 'Marina', 'Sanchez', 'Lopez', 'Marinita', '+34 93 123 45 67', 'Perú', '1990-02-15', 2010, 14),
+('M', 'compositor', 'Alejandro', 'Perez', 'Gutierrez', NULL, '+86 21 1234 5678', 'Brasil', '1980-08-08', 2000,14),
+('H', 'ingeniero', 'Julio', 'Gutierrez', 'Fernandez', NULL, '+61 3 2345 6789', 'Venezuela', '1989-06-03', 2009, 15),
+('M', 'artista', 'Camila', 'Martinez', 'Ruiz', 'Cami', '+7 812 123-45-67', 'Ecuador', '1995-03-22', 2015, 19);
 
 DELETE FROM generos;
 INSERT INTO generos (nombre) VALUES
@@ -66,6 +89,29 @@ INSERT INTO genero_artista_compositor (persona_id, genero_id) VALUES
 (18, 16),
 (20, 18),
 (20, 20);
+
+DELETE FROM especializaciones;
+INSERT INTO especializaciones (nombre) VALUES
+('Producción Musical'),
+('Ingeniería de Sonido'),
+('Composición Musical'),
+('Diseño de Sonido'),
+('Gestión de Eventos Musicales'),
+('Marketing Musical'),
+('Distribución Digital de Música'),
+('Gestión de Derechos de Autor'),
+('Promoción Artística'),
+('Desarrollo de Carrera Musical'),
+('Producción de Conciertos'),
+('Arreglos Musicales'),
+('Ingeniería Acústica'),
+('Edición Musical'),
+('Música para Medios Audiovisuales'),
+('Diseño de Portadas de Álbumes'),
+('Masterización de Audio'),
+('Producción de Música Electrónica'),
+('Tecnología Musical'),
+('Estrategias de Branding en la Industria Musical');
 
 DELETE FROM telefonosPersona;
 INSERT INTO telefonosPersona (telefono, persona_id) VALUES
