@@ -379,144 +379,204 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM personas WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Personas que son artistas y su estudio de grabación fue fundado después de su fecha de nacimiento.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS personas_ArtitasEstudiosFundacionDespuesNacimiento //
+   CREATE PROCEDURE personas_ArtitasEstudiosFundacionDespuesNacimiento()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'artista' AND estudio_id IN (
+            SELECT id FROM estudios WHERE fechaFundacion > fechaNacimiento
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'artista' AND estudio_id IN (
+            SELECT id FROM estudios WHERE fechaFundacion > fechaNacimiento
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL personas_ArtitasEstudiosFundacionDespuesNacimiento();
    ```
 
-   ### 2. 
+   ### 2. Ingenieros que trabajan en estudios fundados en ciudades Europa.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS personas_IngenierosEstudiosEuropa //
+   CREATE PROCEDURE personas_IngenierosEstudiosEuropa()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'ingeniero' AND estudio_id IN (
+            SELECT id FROM estudios WHERE ubicacion IN (
+               SELECT ubicacion FROM estudios WHERE ubicacion RLIKE 'London|Berlin|Paris|Vienna'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'ingeniero' AND estudio_id IN (
+            SELECT id FROM estudios WHERE ubicacion IN (
+               SELECT ubicacion FROM estudios WHERE ubicacion RLIKE 'London|Berlin|Paris|Vienna'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL personas_IngenierosEstudiosEuropa();
    ```
 
-   ### 3. 
+   ### 3. Artistas que son mayores de 25 años y comenzaron su carrera antes o en la misma fecha del primer estudio fundado.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS personas_Artistas25AnyosYCarreraAntesPrimerEstudio //
+   CREATE PROCEDURE personas_Artistas25AnyosYCarreraAntesPrimerEstudio()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'artista'
+         AND YEAR(fechaNacimiento) < 1998
+         AND anyoInicioCarrera <= (
+            SELECT MIN(YEAR(fechaFundacion))
+            FROM estudios
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'artista'
+         AND YEAR(fechaNacimiento) < 1998
+         AND anyoInicioCarrera <= (
+            SELECT MIN(YEAR(fechaFundacion))
+            FROM estudios
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL personas_Artistas25AnyosYCarreraAntesPrimerEstudio();
    ```
 
-   ### 4. 
+   ### 4. Artistas que no tienen un segundo apellido registrado y que trabajan en estudios de California.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS personas_ArtistasNoApellido2EstudiosAustralia //
+   CREATE PROCEDURE personas_ArtistasNoApellido2EstudiosAustralia()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'artista'
+         AND apellido2 IS NULL
+         AND estudio_id IN (
+            SELECT id FROM estudios WHERE ubicacion LIKE '%CA%'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'artista'
+         AND apellido2 IS NULL
+         AND estudio_id IN (
+            SELECT id FROM estudios WHERE ubicacion LIKE '%CA%'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL personas_ArtistasNoApellido2EstudiosAustralia();
    ```
 
-   ### 5. 
+   ### 5. Compositores que trabajan en estudios que tienen al menos un artista.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS personas_CompositoresEstudiosAlmenosUnArtista //
+   CREATE PROCEDURE personas_CompositoresEstudiosAlmenosUnArtista()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'compositor'
+         AND estudio_id IN (
+            SELECT DISTINCT estudio_id FROM personas WHERE tipo = 'artista'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'compositor'
+         AND estudio_id IN (
+            SELECT DISTINCT estudio_id FROM personas WHERE tipo = 'artista'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL personas_CompositoresEstudiosAlmenosUnArtista();
    ```
 
-   ### 6. 
+   ### 6. Compositores que trabajan en más de un estudio.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS personas_CompositoresTrabajanMasEstudios //
+   CREATE PROCEDURE personas_CompositoresTrabajanMasEstudios()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'compositor' AND id IN (
+            SELECT id FROM (
+               SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios
+               FROM personas
+               GROUP BY nombre, apellido1, apellido2
+               HAVING num_estudios > 1
+            ) AS subconsulta
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'compositor' AND id IN (
+            SELECT id FROM (
+               SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios
+               FROM personas
+               GROUP BY nombre, apellido1, apellido2
+               HAVING num_estudios > 1
+            ) AS subconsulta
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL personas_CompositoresTrabajanMasEstudios();
    ```
 
 - ## generos
@@ -547,144 +607,229 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM generos WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Compositores que están asociados al género "Hip Hop" y han trabajado en estudios fundados después del año 2000.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS generos_CompositoresHipHopEstudiosMas2000 //
+   CREATE PROCEDURE generos_CompositoresHipHopEstudiosMas2000()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'compositor'
+         AND estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE YEAR(fechaFundacion) > 2000
+         ) AND id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id = (
+               SELECT id FROM generos
+               WHERE nombre = 'Hip Hop'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'compositor'
+         AND estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE YEAR(fechaFundacion) > 2000
+         ) AND id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id = (
+               SELECT id FROM generos
+               WHERE nombre = 'Hip Hop'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL generos_CompositoresHipHopEstudiosMas2000();
    ```
 
-   ### 2. 
+   ### 2. Artistas que tienen un nombre artístico y están asociados al género "Pop".
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS generos_ArtistasGeneroPop //
+   CREATE PROCEDURE generos_ArtistasGeneroPop()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'artista'
+         AND nombreArtistico IS NOT NULL
+         AND id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id = (
+               SELECT id FROM generos WHERE nombre = 'Pop'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'artista'
+         AND nombreArtistico IS NOT NULL
+         AND id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id = (
+               SELECT id FROM generos WHERE nombre = 'Pop'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL generos_ArtistasGeneroPop();
    ```
 
-   ### 3. 
+   ### 3. Compositores que han trabajado en más de un género.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS generos_CompositoresMasGeneros //
+   CREATE PROCEDURE generos_CompositoresMasGeneros()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'compositor'
+         AND id IN (
+            SELECT persona_id
+            FROM (
+               SELECT persona_id, COUNT(DISTINCT genero_id) AS num_generos
+               FROM genero_artista_compositor
+               GROUP BY persona_id
+               HAVING num_generos > 1
+            ) AS subconsulta
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'compositor'
+         AND id IN (
+            SELECT persona_id
+            FROM (
+               SELECT persona_id, COUNT(DISTINCT genero_id) AS num_generos
+               FROM genero_artista_compositor
+               GROUP BY persona_id
+               HAVING num_generos > 1
+            ) AS subconsulta
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL generos_CompositoresMasGeneros();
    ```
 
-   ### 4. 
+   ### 4. Compositores que han trabajado en géneros diferentes al "Clásica".
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS generos_CompositoresNoGeneroClasico //
+   CREATE PROCEDURE generos_CompositoresNoGeneroClasico()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id != (
+               SELECT id
+               FROM generos
+               WHERE nombre = 'Clásica'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id != (
+               SELECT id
+               FROM generos
+               WHERE nombre = 'Clásica'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL generos_CompositoresNoGeneroClasico();
    ```
 
-   ### 5. 
+   ### 5. Artistas que han trabajado en estudios fundados en su país de origen y están asociados al género "Pop".
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS generos_ArtistasEstudiosOrigenGeneroPop //
+   CREATE PROCEDURE generos_ArtistasEstudiosOrigenGeneroPop()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = "artista"
+         AND estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE ubicacion LIKE CONCAT('%', paisOrigen, '%')
+         ) AND id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id = (
+               SELECT id
+               FROM generos
+               WHERE nombre = 'Pop'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = "artista"
+         AND estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE ubicacion LIKE CONCAT('%', paisOrigen, '%')
+         ) AND id IN (
+            SELECT persona_id
+            FROM genero_artista_compositor
+            WHERE genero_id = (
+               SELECT id
+               FROM generos
+               WHERE nombre = 'Pop'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL generos_ArtistasEstudiosOrigenGeneroPop();
    ```
 
 - ## genero_artista_compositor
@@ -715,144 +860,224 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM genero_artista_compositor WHERE persona_id = 1 AND genero_id = 13;
       ```
 
-   ### 1. 
+   ### 1. Personas que están asociadas al menos a dos géneros diferentes.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS genero_artista_compositor_PersonasGeneros //
+   CREATE PROCEDURE genero_artista_compositor_PersonasGeneros()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM (
+            SELECT
+               p.nombre,
+               CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+               p.tipo
+            FROM genero_artista_compositor gc, personas p
+            WHERE gc.persona_id = p.id
+            GROUP BY gc.persona_id
+            HAVING COUNT(*) >= 2
+         ) AS subconsulta
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+            p.tipo
+         FROM genero_artista_compositor gc, personas p
+         WHERE gc.persona_id = p.id
+         GROUP BY gc.persona_id
+         HAVING COUNT(*) >= 2;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL genero_artista_compositor_PersonasGeneros();
    ```
 
-   ### 2. 
+   ### 2. Géneros asociados a artistas que han comenzado su carrera antes del año 2000.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS genero_artista_compositor_GenerosArtistasInicioAntes2000 //
+   CREATE PROCEDURE genero_artista_compositor_GenerosArtistasInicioAntes2000()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM genero_artista_compositor gc
+         INNER JOIN personas p ON gc.persona_id = p.id
+         WHERE p.tipo = 'artista' AND p.anyoInicioCarrera < 2000
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT gc.genero_id
+         FROM genero_artista_compositor gc
+         INNER JOIN personas p ON gc.persona_id = p.id
+         WHERE p.tipo = 'artista' AND p.anyoInicioCarrera < 2000;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL genero_artista_compositor_GenerosArtistasInicioAntes2000();
    ```
 
-   ### 3. 
+   ### 3. Personas que están asociadas al género 'Rock' y trabajan en estudios de Brazil.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS genero_artista_compositor_PersonasRockEstudiosBrazil //
+   CREATE PROCEDURE genero_artista_compositor_PersonasRockEstudiosBrazil()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM genero_artista_compositor gc, personas p
+         WHERE gc.genero_id = (
+            SELECT id FROM generos
+            WHERE nombre = 'Rock'
+         ) AND p.estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE ubicacion LIKE '%Brazil%'
+         ) AND gc.persona_id = p.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT
+            p.nombre,
+            CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+            p.tipo
+         FROM genero_artista_compositor gc, personas p
+         WHERE gc.genero_id = (
+            SELECT id FROM generos
+            WHERE nombre = 'Rock'
+         ) AND p.estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE ubicacion LIKE '%Brazil%'
+         ) AND gc.persona_id = p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL genero_artista_compositor_PersonasRockEstudiosBrazil();
    ```
 
-   ### 4. 
+   ### 4. Géneros asociados a compositores que han trabajado en estudios fundados antes de 2000.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS genero_artista_compositor_GenerosCompositoresEstudiosAntes2000 //
+   CREATE PROCEDURE genero_artista_compositor_GenerosCompositoresEstudiosAntes2000()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM (
+            SELECT gc.genero_id, g.nombre
+            FROM genero_artista_compositor gc, generos g, personas p
+            WHERE p.tipo = 'compositor'
+            AND gc.genero_id = g.id
+            AND gc.persona_id = p.id
+            AND p.estudio_id IN (
+               SELECT id
+               FROM estudios
+               WHERE YEAR(fechaFundacion) < 2000
+            )
+            GROUP BY gc.genero_id
+         ) AS subconsulta
       );
 
       IF @consulta > 0 THEN
-
+         SELECT gc.genero_id, g.nombre
+         FROM genero_artista_compositor gc, generos g, personas p
+         WHERE p.tipo = 'compositor'
+         AND gc.genero_id = g.id
+         AND gc.persona_id = p.id
+         AND p.estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE YEAR(fechaFundacion) < 2000
+         )
+         GROUP BY gc.genero_id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL genero_artista_compositor_GenerosCompositoresEstudiosAntes2000();
    ```
 
-   ### 5. 
+   ### 5. Personas que están asociadas al menos a un género que no sea 'Rock' ni 'Pop'.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS genero_artista_compositor_PersonasNoGenerosRockPop //
+   CREATE PROCEDURE genero_artista_compositor_PersonasNoGenerosRockPop()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM genero_artista_compositor gc, personas p
+         WHERE gc.genero_id NOT IN (
+            SELECT id
+            FROM generos
+            WHERE nombre IN ('Rock', 'Pop')
+         ) AND gc.persona_id = p.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT
+            p.nombre,
+            CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+            p.tipo
+         FROM genero_artista_compositor gc, personas p
+         WHERE gc.genero_id NOT IN (
+            SELECT id
+            FROM generos
+            WHERE nombre IN ('Rock', 'Pop')
+         ) AND gc.persona_id = p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL genero_artista_compositor_PersonasNoGenerosRockPop();
    ```
 
-   ### 6. 
+   ### 6. Géneros asociados a artistas que trabajan en estudios ubicados en paises de Europa.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS genero_artista_compositor_GenerosArtistasEstudiosEuropa //
+   CREATE PROCEDURE genero_artista_compositor_GenerosArtistasEstudiosEuropa()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM genero_artista_compositor gc, generos g, personas p
+         WHERE p.tipo = 'artista'
+         AND p.estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE ubicacion RLIKE 'UK|Germany|France|Austria'
+         ) AND gc.genero_id = g.id AND gc.persona_id = p.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT gc.genero_id, g.nombre
+         FROM genero_artista_compositor gc, generos g, personas p
+         WHERE p.tipo = 'artista'
+         AND p.estudio_id IN (
+            SELECT id
+            FROM estudios
+            WHERE ubicacion RLIKE 'UK|Germany|France|Austria'
+         ) AND gc.genero_id = g.id AND gc.persona_id = p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL genero_artista_compositor_GenerosArtistasEstudiosEuropa();
    ```
 
 - ## especializaciones
@@ -883,138 +1108,218 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM especializaciones WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Artistas que tienen la especialización "Producción Musical".
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializaciones_ArtistasProduccionMusical //
+   CREATE PROCEDURE especializaciones_ArtistasProduccionMusical()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'artista' AND id IN (
+            SELECT DISTINCT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas
+         WHERE tipo = 'artista' AND id IN (
+            SELECT DISTINCT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializaciones_ArtistasProduccionMusical();
    ```
 
-   ### 2. 
+   ### 2. Compositores que tienen al menos dos especializaciones distintas.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializaciones_Compositores2Especializaciones //
+   CREATE PROCEDURE especializaciones_Compositores2Especializaciones()
    BEGIN
       SET @consulta = (
-         
+        SELECT COUNT(*)
+         FROM personas p
+         WHERE p.tipo = 'compositor' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep
+            WHERE ep.persona_id = p.id
+         ) >= 2
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+         FROM personas p
+         WHERE p.tipo = 'compositor' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep
+            WHERE ep.persona_id = p.id
+         ) >= 2;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializaciones_Compositores2Especializaciones();
    ```
 
-   ### 3. 
+   ### 3. Ingenieros que tienen la especialización "Ingeniería de Sonido" y trabajan en estudios de Argentina.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializaciones_IngenierosSonidoEstudiosArgentina //
+   CREATE PROCEDURE especializaciones_IngenierosSonidoEstudiosArgentina()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p, especializacion_persona ep, especializaciones e, estudios es
+         WHERE p.tipo = "compositor"
+         AND p.id = ep.persona_id
+         AND ep.especializacion_id = e.id
+         AND e.nombre = 'Ingeniería de Sonido'
+         AND p.estudio_id = es.id
+         AND es.ubicacion LIKE '%Argentina%'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas p, especializacion_persona ep, especializaciones e, estudios es
+         WHERE p.tipo = 'compositor'
+         AND p.id = ep.persona_id
+         AND ep.especializacion_id = e.id
+         AND e.nombre = 'Ingeniería de Sonido'
+         AND p.estudio_id = es.id
+         AND es.ubicacion LIKE '%Argentina%';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializaciones_IngenierosSonidoEstudiosArgentina();
    ```
 
-   ### 4. 
+   ### 4. Artistas que tienen al menos tres especializaciones diferentes.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializaciones_Artistas3Especializaciones //
+   CREATE PROCEDURE especializaciones_Artistas3Especializaciones()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         WHERE p.tipo = 'artista' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep
+            WHERE ep.persona_id = p.id
+         ) >= 3
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+         FROM personas p
+         WHERE p.tipo = 'artista' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep
+            WHERE ep.persona_id = p.id
+         ) >= 3;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializaciones_Artistas3Especializaciones();
    ```
 
-   ### 5. 
+   ### 5. Compositores que tienen la especialización "Composición Musical" y han trabajado en estudios fundados antes de 2000.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializaciones_CompositoresComposicionEstudiosAntes2000 //
+   CREATE PROCEDURE especializaciones_CompositoresComposicionEstudiosAntes2000()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE tipo = 'compositor' AND id IN (
+            SELECT ep.persona_id
+            FROM especializacion_persona ep
+            INNER JOIN personas p ON ep.persona_id = p.id
+            INNER JOIN estudios e ON p.estudio_id = e.id
+            WHERE ep.especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Composición Musical'
+            ) AND YEAR(e.fechaFundacion) < 2000
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+         FROM personas p
+         WHERE tipo = 'compositor' AND id IN (
+            SELECT ep.persona_id
+            FROM especializacion_persona ep
+            INNER JOIN personas p ON ep.persona_id = p.id
+            INNER JOIN estudios e ON p.estudio_id = e.id
+            WHERE ep.especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Composición Musical'
+            ) AND YEAR(e.fechaFundacion) < 2000
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializaciones_CompositoresComposicionEstudiosAntes2000();
    ```
 
-   ### 6. 
+   ### 6. Artistas que tienen la especialización "Gestión de Derechos de Autor" y su nombre artístico comienza con 'M'.
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
    CREATE PROCEDURE ()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         WHERE p.tipo = 'artista' AND p.id IN (
+            SELECT ep.persona_id
+            FROM especializacion_persona ep
+            WHERE ep.especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Gestión de Derechos de Autor'
+            ) AND p.nombreArtistico LIKE 'M%' AND ep.persona_id = p.id
+         )
       );
 
       IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+         FROM personas p
+         WHERE p.tipo = 'artista' AND p.id IN (
+            SELECT ep.persona_id
+            FROM especializacion_persona ep
+            WHERE ep.especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Gestión de Derechos de Autor'
+            ) AND p.nombreArtistico LIKE 'M%' AND ep.persona_id = p.id
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
