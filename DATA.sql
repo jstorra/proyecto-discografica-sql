@@ -1,3 +1,5 @@
+USE discografica;
+
 INSERT INTO estudios (nombre, ubicacion, fechaFundacion) VALUES
 ('Estudio Sonic', 'Los Angeles, CA', '2000-05-15'),
 ('SoundLab Studios', 'Nashville, TN', '1998-11-23'),
