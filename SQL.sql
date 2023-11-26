@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS discografica;
+CREATE DATABASE discografica;
+USE discografica;
+
 CREATE TABLE estudios (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   nombre VARCHAR(50) NOT NULL,
@@ -57,7 +61,7 @@ CREATE TABLE albumes (
 
 CREATE TABLE formatos (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(20) NOT NULL
+  nombre VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE formato_album (
@@ -75,16 +79,16 @@ CREATE TABLE canciones (
   compositor_id INT NOT NULL
 );
 
+CREATE TABLE tiposRelanzamiento (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE relanzamientos (
   fechaRelanzamiento DATE NOT NULL,
   album_id INT NOT NULL,
   tipoRelanzamiento_id INT NOT NULL,
   PRIMARY KEY (album_id, fechaRelanzamiento)
-);
-
-CREATE TABLE tiposRelanzamiento (
-  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE ventas (
