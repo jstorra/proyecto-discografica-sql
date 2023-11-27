@@ -132,7 +132,6 @@ ALTER TABLE albumes ADD CONSTRAINT UC_Albumes_Titulo UNIQUE (titulo);
 ALTER TABLE formatos ADD CONSTRAINT UC_Formatos_Nombre UNIQUE (nombre);
 
 ALTER TABLE canciones ADD CONSTRAINT UC_Formatos_Titulo UNIQUE (titulo);
-ALTER TABLE canciones ADD CONSTRAINT UC_Formatos_Letra UNIQUE (letra);
 
 ALTER TABLE estudios ADD CONSTRAINT UC_Estudios_Nombre UNIQUE (nombre);
 
