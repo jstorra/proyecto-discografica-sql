@@ -480,8 +480,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS personas_ArtistasNoApellido2EstudiosAustralia //
-   CREATE PROCEDURE personas_ArtistasNoApellido2EstudiosAustralia()
+   DROP PROCEDURE IF EXISTS personas_ArtistasNoApellido2EstudiosCA //
+   CREATE PROCEDURE personas_ArtistasNoApellido2EstudiosCA()
    BEGIN
       SET @consulta = (
          SELECT COUNT(*)
@@ -506,7 +506,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       END IF;
    END //
    DELIMITER ;
-   CALL personas_ArtistasNoApellido2EstudiosAustralia();
+   CALL personas_ArtistasNoApellido2EstudiosCA();
    ```
 
    ### 5. Compositores que trabajan en estudios que tienen al menos un artista.
@@ -554,7 +554,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             SELECT id FROM (
                SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios
                FROM personas
-               GROUP BY nombre, apellido1, apellido2
+               GROUP BY id
                HAVING num_estudios > 1
             ) AS subconsulta
          )
@@ -567,7 +567,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             SELECT id FROM (
                SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios
                FROM personas
-               GROUP BY nombre, apellido1, apellido2
+               GROUP BY id
                HAVING num_estudios > 1
             ) AS subconsulta
          );
