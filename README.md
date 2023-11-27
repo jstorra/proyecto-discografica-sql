@@ -1918,107 +1918,103 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CALL albumes_CompositoresAlbumes10añosAntiguo();
    ```
 
-   ### 3. 
+   ### 3. Albumes lanzados en febrero y su estudio de grabación.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS albumes_AlbumesFebreroYEstudio //
+   CREATE PROCEDURE albumes_AlbumesFebreroYEstudio()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM albumes a
+         WHERE MONTH(fechaLanzamiento) = 2
       );
 
       IF @consulta > 0 THEN
-
+         SELECT a.titulo, (
+	         SELECT e.nombre
+            FROM estudios e, personas p
+            WHERE a.artista_id = p.id AND p.estudio_id = e.id
+         ) AS estudio
+         FROM albumes a
+         WHERE MONTH(fechaLanzamiento) = 2;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL albumes_AlbumesFebreroYEstudio();
    ```
 
-   ### 4. 
+   ### 4. Albumes con nombre artístico del artista y ubicación del estudio.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS albumes_AlbumesArtistaUbicacionEstudio //
+   CREATE PROCEDURE albumes_AlbumesArtistaUbicacionEstudio()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM albumes a, personas p, estudios e
+         WHERE a.artista_id = p.id AND p.estudio_id = e.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo, (
+            SELECT nombreArtistico
+            FROM personas
+            WHERE id = artista_id
+         ) AS nombreArtistico, (
+            SELECT ubicacion
+            FROM estudios
+            WHERE id = p.estudio_id
+         ) AS ubicacionEstudio
+         FROM albumes a, personas p, estudios e
+         WHERE a.artista_id = p.id AND p.estudio_id = e.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL albumes_AlbumesArtistaUbicacionEstudio();
    ```
 
-   ### 5. 
+   ### 5. Albumes y países de origen de artistas femeninas.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS albumes_AlbumesPaisesOrigenArtistasM //
+   CREATE PROCEDURE albumes_AlbumesPaisesOrigenArtistasM()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM albumes
+         WHERE (
+            SELECT sexo
+            FROM personas
+            WHERE id = artista_id
+         ) = 'M'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo, (
+            SELECT paisOrigen
+            FROM personas
+            WHERE id = artista_id
+         ) AS pais
+         FROM albumes
+         WHERE (
+            SELECT sexo
+            FROM personas
+            WHERE id = artista_id
+         ) = 'M';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL albumes_AlbumesPaisesOrigenArtistasM();
    ```
 
 - ## formatos
@@ -2049,144 +2045,198 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM formatos WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Obten la cantidad de álbumes asociados a cada formato.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formatos_CantAlbumesFormato //
+   CREATE PROCEDURE formatos_CantAlbumesFormato()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos
       );
 
       IF @consulta > 0 THEN
-
+         SELECT f.nombre, (
+            SELECT COUNT(*) FROM formato_album fa
+            WHERE f.id = fa.formato_id
+         )  AS cantidad_albumes
+         FROM formatos f;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formatos_CantAlbumesFormato();
    ```
 
-   ### 2. 
+   ### 2. Obtén los formatos que no están asociados a ningún álbum.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formatos_FormatosNoAlbum //
+   CREATE PROCEDURE formatos_FormatosNoAlbum()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos
+         WHERE id NOT IN (
+            SELECT DISTINCT formato_id
+            FROM formato_album
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM formatos
+         WHERE id NOT IN (
+            SELECT DISTINCT formato_id
+            FROM formato_album
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formatos_FormatosNoAlbum();
    ```
 
-   ### 3. 
+   ### 3. Obtén el formato más utilizado.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formatos_FormatoMasUtilizado //
+   CREATE PROCEDURE formatos_FormatoMasUtilizado()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos
+         WHERE (
+            SELECT COUNT(*)
+            FROM formato_album
+            WHERE formatos.id = formato_album.formato_id
+         ) = (
+            SELECT COUNT(*) FROM formatos f, formato_album fa
+            WHERE f.id = fa.formato_id
+            GROUP BY f.id
+            ORDER BY COUNT(*) DESC
+            LIMIT 1
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *, (
+            SELECT COUNT(*)
+            FROM formato_album
+            WHERE formatos.id = formato_album.formato_id
+         ) AS cantidad_usos
+         FROM formatos
+         WHERE (
+            SELECT COUNT(*)
+            FROM formato_album
+            WHERE formatos.id = formato_album.formato_id
+         ) = (
+            SELECT COUNT(*) FROM formatos f, formato_album fa
+            WHERE f.id = fa.formato_id
+            GROUP BY f.id
+            ORDER BY COUNT(*) DESC
+            LIMIT 1
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formatos_FormatoMasUtilizado();
    ```
 
-   ### 4. 
+   ### 4. Obtén los formatos que fueron utilizados en álbumes lanzados antes del 2010.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formatos_FormatosUsadosAlbumesAntes2010 //
+   CREATE PROCEDURE formatos_FormatosUsadosAlbumesAntes2010()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id
+         AND fa.album_id = a.id
+         AND YEAR(a.fechaLanzamiento) < 2010
       );
 
       IF @consulta > 0 THEN
-
+         SELECT f.* FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id
+         AND fa.album_id = a.id
+         AND YEAR(a.fechaLanzamiento) < 2010;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formatos_FormatosUsadosAlbumesAntes2010();
    ```
 
-   ### 5. 
+   ### 5. Obtén los formatos utilizados en álbumes cuyo título no contiene la palabra "Música".
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formatos_FormatosAlbumesNoPalabraMusica //
+   CREATE PROCEDURE formatos_FormatosAlbumesNoPalabraMusica()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id
+         AND fa.album_id = a.id
+         AND a.titulo NOT LIKE '%Música%'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT f.*
+         FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id
+         AND fa.album_id = a.id
+         AND a.titulo NOT LIKE '%Música%';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formatos_FormatosAlbumesNoPalabraMusica();
    ```
 
-   ### 6. 
+   ### 6. Obtén los formatos utilizados en álbumes del artista con id igual a 14 y lanzados en el año 2019.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formatos_FormatosAlbumesArtista14Año2019 //
+   CREATE PROCEDURE formatos_FormatosAlbumesArtista14Año2019()
    BEGIN
       SET @consulta = (
-         
+         SELECT DISTINCT COUNT(*)
+         FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id
+         AND fa.album_id = a.id
+         AND a.artista_id = 14
+         AND YEAR(a.fechaLanzamiento) = 2019
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT f.*
+         FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id
+         AND fa.album_id = a.id
+         AND a.artista_id = 14
+         AND YEAR(a.fechaLanzamiento) = 2019;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL formatos_FormatosAlbumesArtista14Año2019();
    ```
 
 - ## formato_album
@@ -2217,144 +2267,209 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM formato_album WHERE album_id = 1 AND formato_id = 4;
       ```
 
-   ### 1. 
+   ### 1. Obtener los títulos de los álbumes que tienen al menos un formato en vinilo.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formato_album_AlbumesFormatoVinilo //
+   CREATE PROCEDURE formato_album_AlbumesFormatoVinilo()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formato_album
+         WHERE formato_id IN (
+            SELECT id
+            FROM formatos
+            WHERE nombre LIKE 'Vinilo%'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT album_id, (
+            SELECT titulo
+            FROM albumes
+            WHERE id = album_id
+         ) AS titulo
+         FROM formato_album
+         WHERE formato_id IN (
+            SELECT id
+            FROM formatos
+            WHERE nombre LIKE 'Vinilo%'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formato_album_AlbumesFormatoVinilo();
    ```
 
-   ### 2. 
+   ### 2. Encontrar los formatos utilizados para un álbum específico (por ejemplo, 'Amanecer Musical')
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formato_album_FormatosAlbumEspecifico //
+   CREATE PROCEDURE formato_album_FormatosAlbumEspecifico()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos
+         WHERE id IN (
+            SELECT formato_id
+            FROM formato_album
+            WHERE album_id = (
+               SELECT id FROM albumes WHERE titulo = 'Amanecer Musical'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM formatos
+         WHERE id IN (
+            SELECT formato_id
+            FROM formato_album
+            WHERE album_id = (
+               SELECT id FROM albumes WHERE titulo = 'Amanecer Musical'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formato_album_FormatosAlbumEspecifico();
    ```
 
-   ### 3. 
+   ### 3. Obtener los títulos de los álbumes que tienen al menos un formato en CD pero ninguno en Vinilo.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formato_album_AlbumesFormatoCDNoVinilo //
+   CREATE PROCEDURE formato_album_AlbumesFormatoCDNoVinilo()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formato_album
+         WHERE formato_id IN (
+            SELECT id FROM formatos WHERE nombre LIKE 'CD%'
+         ) AND album_id NOT IN (
+            SELECT DISTINCT album_id
+            FROM formato_album
+            WHERE formato_id IN (
+               SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT album_id, (
+            SELECT titulo
+            FROM albumes
+            WHERE id = album_id
+         ) AS titulo
+         FROM formato_album
+         WHERE formato_id IN (
+            SELECT id FROM formatos WHERE nombre LIKE 'CD%'
+         ) AND album_id NOT IN (
+            SELECT DISTINCT album_id
+            FROM formato_album
+            WHERE formato_id IN (
+               SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formato_album_AlbumesFormatoCDNoVinilo();
    ```
 
-   ### 4. 
+   ### 4. Obtener los títulos de los álbumes que tienen al menos un formato en vinilo y fueron lanzados antes del 2010.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formato_album_AlbumesFormatoVinilo2010 //
+   CREATE PROCEDURE formato_album_AlbumesFormatoVinilo2010()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formato_album
+         WHERE formato_id IN (
+            SELECT id
+            FROM formatos
+            WHERE nombre LIKE 'Vinilo%'
+         ) AND album_id IN (
+            SELECT id
+            FROM albumes
+            WHERE fechaLanzamiento < '2010-01-01'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT album_id, (
+            SELECT titulo
+            FROM albumes
+            WHERE id = album_id
+         ) AS titulo
+         FROM formato_album
+         WHERE formato_id IN (
+            SELECT id
+            FROM formatos
+            WHERE nombre LIKE 'Vinilo%'
+         ) AND album_id IN (
+            SELECT id
+            FROM albumes
+            WHERE fechaLanzamiento < '2010-01-01'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL formato_album_AlbumesFormatoVinilo2010();
    ```
 
-   ### 5. 
+   ### 5. Encontrar los formatos utilizados para los álbumes del artista con id 4.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS formato_album_FormatosAlbumesArtista4 //
+   CREATE PROCEDURE formato_album_FormatosAlbumesArtista4()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM formatos
+         WHERE id IN (
+            SELECT formato_id
+            FROM formato_album
+            WHERE album_id IN (
+               SELECT id
+               FROM albumes
+               WHERE artista_id = 4
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM formatos
+         WHERE id IN (
+            SELECT formato_id
+            FROM formato_album
+            WHERE album_id IN (
+               SELECT id
+               FROM albumes
+               WHERE artista_id = 4
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL formato_album_FormatosAlbumesArtista4();
    ```
 
 - ## canciones
