@@ -871,7 +871,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
          SELECT COUNT(*) FROM (
             SELECT
                p.nombre,
-               CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+               TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
                p.tipo
             FROM genero_artista_compositor gc, personas p
             WHERE gc.persona_id = p.id
@@ -883,7 +883,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT
             p.nombre,
-            CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+            TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
             p.tipo
          FROM genero_artista_compositor gc, personas p
          WHERE gc.persona_id = p.id
@@ -947,7 +947,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT DISTINCT
             p.nombre,
-            CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+            TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
             p.tipo
          FROM genero_artista_compositor gc, personas p
          WHERE gc.genero_id = (
@@ -1029,7 +1029,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT DISTINCT
             p.nombre,
-            CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, '')) AS apellidos,
+            TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
             p.tipo
          FROM genero_artista_compositor gc, personas p
          WHERE gc.genero_id NOT IN (
@@ -1164,7 +1164,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT
             p.nombre,
-            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
          FROM personas p
          WHERE p.tipo = 'compositor' AND (
             SELECT COUNT(*) FROM especializacion_persona ep
@@ -1232,7 +1232,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT
             p.nombre,
-            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
          FROM personas p
          WHERE p.tipo = 'artista' AND (
             SELECT COUNT(*) FROM especializacion_persona ep
@@ -1270,7 +1270,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT
             p.nombre,
-            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
          FROM personas p
          WHERE tipo = 'compositor' AND id IN (
             SELECT ep.persona_id
@@ -1293,8 +1293,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializaciones_ArtistasGestoresNombreArtisticoM //
+   CREATE PROCEDURE especializaciones_ArtistasGestoresNombreArtisticoM()
    BEGIN
       SET @consulta = (
          SELECT COUNT(*)
@@ -1311,7 +1311,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       IF @consulta > 0 THEN
          SELECT
             p.nombre,
-            CONCAT(p.apellido1,' ', IFNULL(p.apellido2, '')) AS apellidos
+            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
          FROM personas p
          WHERE p.tipo = 'artista' AND p.id IN (
             SELECT ep.persona_id
@@ -1325,7 +1325,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializaciones_ArtistasGestoresNombreArtisticoM();
    ```
 
 - ## especializacion_persona
@@ -1357,144 +1357,293 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM especializacion_persona WHERE especializacion_id = 1 AND persona_id = 11;
       ```
 
-   ### 1. 
+   ### 1. Subconsulta para obtener nombres de personas con especialización en 'Producción Musical'.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_PersonasProduccionMusical //
+   CREATE PROCEDURE especializacion_persona_PersonasProduccionMusical()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            nombre,
+            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_PersonasProduccionMusical();
    ```
 
-   ### 2. 
+   ### 2. Obtener especializaciones de la persona con Nombre Artístico 'Sof'.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_EspecializacionesArtistaSof //
+   CREATE PROCEDURE especializacion_persona_EspecializacionesArtistaSof()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM especializaciones
+         WHERE id IN (
+            SELECT especializacion_id
+            FROM especializacion_persona
+            WHERE persona_id = (
+               SELECT id FROM personas WHERE nombreArtistico = 'Sof'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT nombre
+         FROM especializaciones
+         WHERE id IN (
+            SELECT especializacion_id
+            FROM especializacion_persona
+            WHERE persona_id = (
+               SELECT id FROM personas WHERE nombreArtistico = 'Sof'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_EspecializacionesArtistaSof();
    ```
 
-   ### 3. 
+   ### 3. Personas con especialización en 'Diseño de Sonido' y que sean Ingenieros.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_IngenierosDiseñoDeSonido //
+   CREATE PROCEDURE especializacion_persona_IngenierosDiseñoDeSonido()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id
+               FROM especializaciones
+               WHERE nombre = 'Diseño de Sonido'
+            )
+         ) AND tipo = 'ingeniero'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            nombre,
+            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id
+               FROM especializaciones
+               WHERE nombre = 'Diseño de Sonido'
+            )
+         ) AND tipo = 'ingeniero';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_IngenierosDiseñoDeSonido();
    ```
 
-   ### 4. 
+   ### 4. Personas que comparten especialización con la persona de nombre artístico 'Miguelito'.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_PersonasEspecializacionMiguelito //
+   CREATE PROCEDURE especializacion_persona_PersonasEspecializacionMiguelito()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id IN (
+               SELECT especializacion_id
+               FROM especializacion_persona
+               WHERE persona_id = (
+                  SELECT id
+                     FROM personas
+                     WHERE nombreArtistico = 'Miguelito'
+               )
+            )
+         ) AND nombreArtistico != 'Miguelito'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            nombre,
+            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id IN (
+               SELECT especializacion_id
+               FROM especializacion_persona
+               WHERE persona_id = (
+                  SELECT id
+                     FROM personas
+                     WHERE nombreArtistico = 'Miguelito'
+               )
+            )
+         ) AND nombreArtistico != 'Miguelito';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_PersonasEspecializacionMiguelito();
    ```
 
-   ### 5. 
+   ### 5. Obtener estudios con personas especializadas en 'Ingeniería de Sonido'.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_EstudiosPersonasIngenieriaSonido //
+   CREATE PROCEDURE especializacion_persona_EstudiosPersonasIngenieriaSonido()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM estudios
+         WHERE id IN (
+            SELECT estudio_id
+            FROM personas
+            WHERE tipo = 'ingeniero' AND id IN (
+               SELECT persona_id
+               FROM especializacion_persona
+               WHERE especializacion_id = (
+                  SELECT id FROM especializaciones WHERE nombre = 'Ingeniería de Sonido'
+               )
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT nombre
+         FROM estudios
+         WHERE id IN (
+            SELECT estudio_id
+            FROM personas
+            WHERE tipo = 'ingeniero' AND id IN (
+               SELECT persona_id
+               FROM especializacion_persona
+               WHERE especializacion_id = (
+                  SELECT id FROM especializaciones WHERE nombre = 'Ingeniería de Sonido'
+               )
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_EstudiosPersonasIngenieriaSonido();
    ```
 
-   ### 6. 
+   ### 6. Subconsulta para obtener personas con mas de una especialización.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_PersonasMasEspecializaciones //
+   CREATE PROCEDURE especializacion_persona_PersonasMasEspecializaciones()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         WHERE (
+            SELECT COUNT(*)
+            FROM especializacion_persona ep
+            WHERE ep.persona_id = p.id
+         ) > 1
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            TRIM(CONCAT(p.apellido1,' ',IFNULL(p.apellido2,''))) AS apellidos
+         FROM personas p
+         WHERE (
+            SELECT COUNT(*)
+            FROM especializacion_persona ep
+            WHERE ep.persona_id = p.id
+         ) > 1;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_PersonasMasEspecializaciones();
    ```
 
-   ### 7. 
+   ### 7. Personas con especialización en 'Composición Musical' que no sean de Argentina.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS especializacion_persona_PersonasComposicionNoArgentina //
+   CREATE PROCEDURE especializacion_persona_PersonasComposicionNoArgentina()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Composición Musical'
+            )
+         ) AND paisOrigen != 'Argentina'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            nombre,
+            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2,''))) AS apellidos
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM especializacion_persona
+            WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Composición Musical'
+            )
+         ) AND paisOrigen != 'Argentina';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL especializacion_persona_PersonasComposicionNoArgentina();
    ```
 
 - ## telefonosPersona
@@ -1525,144 +1674,161 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM telefonosPersona WHERE persona_id = 1;
       ```
 
-   ### 1. 
+   ### 1. Obtener personas que comparten el mismo teléfono.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS telefonosPersona_PersonasMismoTelefono //
+   CREATE PROCEDURE telefonosPersona_PersonasMismoTelefono()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         JOIN telefonosPersona tp1 ON p.id = tp1.persona_id
+         JOIN telefonosPersona tp2 ON tp1.telefono = tp2.telefono
+         WHERE tp1.persona_id != tp2.persona_id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT p.*
+         FROM personas p
+         JOIN telefonosPersona tp1 ON p.id = tp1.persona_id
+         JOIN telefonosPersona tp2 ON tp1.telefono = tp2.telefono
+         WHERE tp1.persona_id != tp2.persona_id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL telefonosPersona_PersonasMismoTelefono();
    ```
 
-   ### 2. 
+   ### 2. Obtener personas cuyo teléfono empieza con '+1' y son artistas.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS telefonosPersona_ArtistasTelefono1 //
+   CREATE PROCEDURE telefonosPersona_ArtistasTelefono1()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM telefonosPersona
+            WHERE telefono LIKE '+1%'
+         ) AND tipo = 'artista'
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            nombre,
+            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas
+         WHERE id IN (
+            SELECT persona_id
+            FROM telefonosPersona
+            WHERE telefono LIKE '+1%'
+         ) AND tipo = 'artista';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL telefonosPersona_ArtistasTelefono1();
    ```
 
-   ### 3. 
+   ### 3. Listar teléfonos secundarios y personas con nombre artístico.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS telefonosPersona_TelefonosSecundariosArtistico //
+   CREATE PROCEDURE telefonosPersona_TelefonosSecundariosArtistico()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM (
+            SELECT p.nombre
+            FROM personas p, telefonosPersona tp
+            WHERE p.nombreArtistico IS NOT NULL
+            AND p.id = tp.persona_id
+            GROUP BY p.id
+         ) AS subconsulta
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            TRIM(CONCAT(p.apellido1,' ',IFNULL(p.apellido2,''))) AS apellidos,
+            GROUP_CONCAT(DISTINCT '( ',tp.telefono,' )' SEPARATOR ' - ') AS telefonos_secundarios
+         FROM personas p, telefonosPersona tp
+         WHERE p.nombreArtistico IS NOT NULL
+         AND p.id = tp.persona_id
+         GROUP BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL telefonosPersona_TelefonosSecundariosArtistico();
    ```
 
-   ### 4. 
+   ### 4. Obtener personas con más de un teléfono, mostrar el principal y cuales son los otros telefonos.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS telefonosPersona_PersonasSegundoTelefono //
+   CREATE PROCEDURE telefonosPersona_PersonasSegundoTelefono()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p , telefonosPersona tp
+         WHERE p.id = tp.persona_id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+	         p.nombre,
+            TRIM(CONCAT(p.apellido1,' ',IFNULL(apellido2,''))) AS apellidos,
+            p.telefonoPrincipal,
+            GROUP_CONCAT('( ',tp.telefono,' )' SEPARATOR ' - ') AS otros_telefonos
+         FROM personas p , telefonosPersona tp
+         WHERE p.id = tp.persona_id
+         GROUP BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL telefonosPersona_PersonasSegundoTelefono();
    ```
 
-   ### 5. 
+   ### 5. Contar teléfonos secundarios por país de origen.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS telefonosPersona_CantTelefonosPaisOrigen //
+   CREATE PROCEDURE telefonosPersona_CantTelefonosPaisOrigen()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM (
+            SELECT paisOrigen, COUNT(telefono) AS cantidadTelefonos
+            FROM telefonosPersona
+            JOIN personas ON telefonosPersona.persona_id = personas.id
+            GROUP BY paisOrigen
+         ) AS subconsulta
       );
 
       IF @consulta > 0 THEN
-
+         SELECT paisOrigen, COUNT(telefono) AS cantidadTelefonos
+         FROM telefonosPersona
+         JOIN personas ON telefonosPersona.persona_id = personas.id
+         GROUP BY paisOrigen;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL telefonosPersona_CantTelefonosPaisOrigen();
    ```
 
 - ## albumes
@@ -1694,47 +1860,66 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM albumes WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Artistas de los albumes lanzados en 2022.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS albumes_ArtistasAlbumes2022 //
+   CREATE PROCEDURE albumes_ArtistasAlbumes2022()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM albumes
+         WHERE YEAR(fechaLanzamiento) = 2022
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo, (
+            SELECT CONCAT(nombre, ' ', apellido1)
+            FROM personas
+            WHERE id = artista_id
+         ) AS artista
+         FROM albumes
+         WHERE YEAR(fechaLanzamiento) = 2022;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL albumes_ArtistasAlbumes2022();
    ```
 
-   ### 2. 
+   ### 2. Compositores de albumes con una antiguedad de más de 10 años.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS albumes_CompositoresAlbumes10añosAntiguo //
+   CREATE PROCEDURE albumes_CompositoresAlbumes10añosAntiguo()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM albumes
+         WHERE YEAR(CURDATE()) - YEAR(fechaLanzamiento) > 10
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo, (
+            SELECT CONCAT(nombre, ' ', apellido1)
+            FROM personas
+            WHERE id = artista_id
+         ) AS compositor, CONCAT(YEAR(CURDATE()) - YEAR(fechaLanzamiento),' años') AS antiguedad
+         FROM albumes
+         WHERE YEAR(CURDATE()) - YEAR(fechaLanzamiento) > 10;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL albumes_CompositoresAlbumes10añosAntiguo();
    ```
 
    ### 3. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -1755,6 +1940,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 4. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -1775,6 +1961,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 5. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
