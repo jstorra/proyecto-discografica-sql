@@ -2507,144 +2507,175 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM canciones WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Canciones y sus compositores que son artistas.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS canciones_CancionesCompositoresSonArtistas //
+   CREATE PROCEDURE canciones_CancionesCompositoresSonArtistas()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM canciones
+         WHERE compositor_id IN (
+            SELECT id
+            FROM personas
+            WHERE tipo = 'artista'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo AS cancion, (
+            SELECT CONCAT(nombre, ' ', apellido1)
+            FROM personas WHERE
+            id = canciones.compositor_id
+         ) AS compositor
+         FROM canciones
+         WHERE compositor_id IN (
+            SELECT id
+            FROM personas
+            WHERE tipo = 'artista'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL canciones_CancionesCompositoresSonArtistas();
    ```
 
-   ### 2. 
+   ### 2. Canciones y la edad del compositor en el Año del Lanzamiento del album.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS canciones_CancionesEdadCompositorLanzamientoAlbum //
+   CREATE PROCEDURE canciones_CancionesEdadCompositorLanzamientoAlbum()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM canciones c, personas p, albumes a
+         WHERE p.id = c.compositor_id AND c.album_id = a.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            c.titulo AS cancion,
+            p.nombre,
+            CONCAT(
+               (SELECT YEAR(a.fechaLanzamiento) - YEAR(p.fechaNacimiento)),' años'
+            ) AS edad_compositor_en_album
+         FROM canciones c, personas p, albumes a
+         WHERE p.id = c.compositor_id AND c.album_id = a.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL canciones_CancionesEdadCompositorLanzamientoAlbum();
    ```
 
-   ### 3. 
+   ### 3. Canciones y la diferencia de años entre el Compositor y el Artista.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS canciones_CancionesYDifEdadesCompoArtista //
+   CREATE PROCEDURE canciones_CancionesYDifEdadesCompoArtista()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM canciones c, albumes a
+         WHERE c.album_id = a.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT c.titulo AS cancion, (
+            SELECT fechaNacimiento FROM personas WHERE id = c.compositor_id
+         ) AS fecha_nacimiento_compositor, (
+            SELECT fechaNacimiento FROM personas WHERE id = a.artista_id
+         ) AS fecha_nacimiento_artista, ABS((
+            SELECT YEAR(fechaNacimiento) FROM personas WHERE id = c.compositor_id
+         ) - (
+            SELECT YEAR(fechaNacimiento) FROM personas WHERE id = a.artista_id
+         )) AS anios_diferencia
+         FROM canciones c, albumes a
+         WHERE c.album_id = a.id
+         ORDER BY anios_diferencia DESC;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL canciones_CancionesYDifEdadesCompoArtista();
    ```
 
-   ### 4. 
+   ### 4. Obtener las canciones de un artista donde la fecha de lanzamiento del album fue hace mas de 5 años.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS canciones_CancionesArtistaAlbumHace5Años //
+   CREATE PROCEDURE canciones_CancionesArtistaAlbumHace5Años()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM canciones c, albumes a, personas p
+         WHERE c.album_id = a.id
+         AND a.artista_id = p.id
+         AND YEAR(CURDATE()) - YEAR(a.fechaLanzamiento) > 5
       );
 
       IF @consulta > 0 THEN
-
+         SELECT c.titulo AS cancion, (
+            SELECT TRIM(CONCAT(nombre,' ',apellido1,' ',IFNULL(apellido2,'')))
+            FROM personas
+            WHERE id = c.compositor_id
+         ) AS compositor_cancion,
+         TRIM(CONCAT(p.nombre,' ',p.apellido1,' ',IFNULL(p.apellido2,''))) AS nombre_artista,
+         p.nombreArtistico AS nombre_artistico
+         FROM canciones c, albumes a, personas p
+         WHERE c.album_id = a.id
+         AND a.artista_id = p.id
+         AND YEAR(CURDATE()) - YEAR(a.fechaLanzamiento) > 5;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL canciones_CancionesArtistaAlbumHace5Años();
    ```
 
-   ### 5. 
+   ### 5. Canciones donde su compositor ha compuestó mas canciones.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS canciones_CancionesCompositoresCompuestoMasCanciones //
+   CREATE PROCEDURE canciones_CancionesCompositoresCompuestoMasCanciones()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM canciones
+         WHERE compositor_id IN (
+            SELECT id FROM personas
+            WHERE (
+               SELECT COUNT(*) FROM canciones
+               WHERE personas.id = compositor_id
+            ) > 1
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo AS cancion FROM canciones
+         WHERE compositor_id IN (
+            SELECT id FROM personas
+            WHERE (
+               SELECT COUNT(*) FROM canciones
+               WHERE personas.id = compositor_id
+            ) > 1
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL canciones_CancionesCompositoresCompuestoMasCanciones();
    ```
 
 - ## tiposRelanzamiento
@@ -2675,144 +2706,164 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM tiposRelanzamiento WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Obtener la cantidad de albumes por Tipo de Relanzamiento y ordernarlos de mayor a menor cantidad.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS tiposRelanzamiento_CantAlbumesPorTipoRelanzamiento //
+   CREATE PROCEDURE tiposRelanzamiento_CantAlbumesPorTipoRelanzamiento()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM tiposRelanzamiento tr
       );
 
       IF @consulta > 0 THEN
-
+         SELECT tr.nombre AS tipo_relanzamiento, (
+            SELECT COUNT(*) 
+            FROM relanzamientos 
+            WHERE tipoRelanzamiento_id = tr.id
+         ) AS cantidad_albumes
+         FROM tiposRelanzamiento tr
+         ORDER BY cantidad_albumes DESC;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL tiposRelanzamiento_CantAlbumesPorTipoRelanzamiento();
    ```
 
-   ### 2. 
+   ### 2. Subconsulta para obtener el ultimo album relanzado por tipo y ordenarlo alfabeticamente.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS tiposRelanzamiento_UltimoAlbumPorTipoRelanzamiento //
+   CREATE PROCEDURE tiposRelanzamiento_UltimoAlbumPorTipoRelanzamiento()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM tiposRelanzamiento tr, relanzamientos r, albumes a
+         WHERE tr.id = r.tipoRelanzamiento_id AND r.album_id = a.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT a.titulo AS album, tr.nombre AS tipo_relanzamiento, (
+            SELECT MAX(fechaRelanzamiento)
+            FROM relanzamientos
+            WHERE tipoRelanzamiento_id = tr.id
+         ) AS ultima_fecha_relanzamiento
+         FROM tiposRelanzamiento tr, relanzamientos r, albumes a
+         WHERE tr.id = r.tipoRelanzamiento_id AND r.album_id = a.id
+         GROUP BY ultima_fecha_relanzamiento
+         ORDER BY album;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL tiposRelanzamiento_UltimoAlbumPorTipoRelanzamiento();
    ```
 
-   ### 3. 
+   ### 3. Subconsulta para obtener el Tipo de Relanzamiento con más albumes.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS tiposRelanzamiento_TipoRelanzamientoConMasAlbumes //
+   CREATE PROCEDURE tiposRelanzamiento_TipoRelanzamientoConMasAlbumes()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM tiposRelanzamiento tr
       );
 
       IF @consulta > 0 THEN
-
+         SELECT nombre AS tipo_relanzamiento
+         FROM tiposRelanzamiento tr
+         ORDER BY (
+            SELECT COUNT(*) 
+            FROM relanzamientos 
+            WHERE tipoRelanzamiento_id = tr.id
+         ) DESC
+         LIMIT 1;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL tiposRelanzamiento_TipoRelanzamientoConMasAlbumes();
    ```
 
-   ### 4. 
+   ### 4. Obtener el Tipo de Relanzamiento con la mayor brecha de tiempo entre relanzamientos.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS tiposRelanzamiento_TipoRelanzamientoMayorBrecha //
+   CREATE PROCEDURE tiposRelanzamiento_TipoRelanzamientoMayorBrecha()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM tiposRelanzamiento tr
+         WHERE id = (
+            SELECT tipoRelanzamiento_id
+            FROM relanzamientos
+            GROUP BY tipoRelanzamiento_id
+            ORDER BY MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) DESC
+            LIMIT 1
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT nombre AS tipo_relanzamiento
+         FROM tiposRelanzamiento tr
+         WHERE id = (
+            SELECT tipoRelanzamiento_id
+            FROM relanzamientos
+            GROUP BY tipoRelanzamiento_id
+            ORDER BY MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) DESC
+            LIMIT 1
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL tiposRelanzamiento_TipoRelanzamientoMayorBrecha();
    ```
 
-   ### 5. 
+   ### 5. Obtener el Tipo de Relanzamiento con más de 10 años de historia.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS tiposRelanzamiento_TipoRelanzamiento10años //
+   CREATE PROCEDURE tiposRelanzamiento_TipoRelanzamiento10años()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM tiposRelanzamiento tr
+         WHERE id IN (
+            SELECT tipoRelanzamiento_id
+            FROM relanzamientos
+            GROUP BY tipoRelanzamiento_id
+            HAVING MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) > 3650
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT nombre AS tipo_relanzamiento
+         FROM tiposRelanzamiento tr
+         WHERE id IN (
+            SELECT tipoRelanzamiento_id
+            FROM relanzamientos
+            GROUP BY tipoRelanzamiento_id
+            HAVING MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) > 3650
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL tiposRelanzamiento_TipoRelanzamiento10años();
    ```
 
 - ## relanzamientos
@@ -2845,144 +2896,184 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM relanzamientos WHERE fechaRelanzamiento = '2022-03-20' AND album_id = 1;
       ```
 
-   ### 1. 
+   ### 1. Mostrar los artistas que han lanzado álbumes remasterizados.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS relanzamientos_ArtistasAlbumesRemasterizados //
+   CREATE PROCEDURE relanzamientos_ArtistasAlbumesRemasterizados()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         JOIN albumes a ON p.id = a.artista_id
+         WHERE EXISTS (
+            SELECT * FROM relanzamientos r
+            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id = (
+               SELECT id FROM tiposRelanzamiento WHERE nombre = 'Remasterizado'
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas p
+         JOIN albumes a ON p.id = a.artista_id
+         WHERE EXISTS (
+            SELECT * FROM relanzamientos r
+            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id = (
+               SELECT id FROM tiposRelanzamiento WHERE nombre = 'Remasterizado'
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL relanzamientos_ArtistasAlbumesRemasterizados();
    ```
 
-   ### 2. 
+   ### 2. Encontrar los tipos de relanzamiento utilizados para un álbum específico (por ejemplo, 'Amanecer Musical').
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS relanzamientos_TiposRelanzamientosAlbumEspecifico //
+   CREATE PROCEDURE relanzamientos_TiposRelanzamientosAlbumEspecifico()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM tiposRelanzamiento t
+         JOIN relanzamientos r ON t.id = r.tipoRelanzamiento_id
+         WHERE r.album_id = (
+            SELECT id
+            FROM albumes
+            WHERE titulo = 'Amanecer Musical'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT t.nombre AS tipo_relanzamiento
+         FROM tiposRelanzamiento t
+         JOIN relanzamientos r ON t.id = r.tipoRelanzamiento_id
+         WHERE r.album_id = (
+            SELECT id
+            FROM albumes
+            WHERE titulo = 'Amanecer Musical'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL relanzamientos_TiposRelanzamientosAlbumEspecifico();
    ```
 
-   ### 3. 
+   ### 3. Contar cuántos álbumes ha lanzado cada artista, incluyendo relanzamientos.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS relanzamientos_CantAlbumesArtistaConRelanzados //
+   CREATE PROCEDURE relanzamientos_CantAlbumesArtistaConRelanzados()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         LEFT JOIN albumes a ON p.id = a.artista_id
+         LEFT JOIN relanzamientos r ON a.id = r.album_id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.nombre,
+            TRIM(CONCAT(p.apellido1,' ',IFNULL(p.apellido2,''))) AS apellidos,
+            p.nombreArtistico,
+            COUNT(a.id) + COUNT(r.album_id) AS total_albumes
+         FROM personas p
+         LEFT JOIN albumes a ON p.id = a.artista_id
+         LEFT JOIN relanzamientos r ON a.id = r.album_id
+         GROUP BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL relanzamientos_CantAlbumesArtistaConRelanzados();
    ```
 
-   ### 4. 
+   ### 4. Mostrar los álbumes que han sido relanzados en aniversarios (tipo de relanzamiento) en el año 2022.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS relanzamientos_AlbumesRelanzadosUniversario2022 //
+   CREATE PROCEDURE relanzamientos_AlbumesRelanzadosUniversario2022()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM albumes
+         WHERE id IN (
+            SELECT album_id FROM relanzamientos
+            WHERE tipoRelanzamiento_id = (
+               SELECT id FROM tiposRelanzamiento WHERE nombre = 'Aniversario' 
+            ) AND YEAR(fechaRelanzamiento) = 2022
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT titulo AS titulo_album
+         FROM albumes
+         WHERE id IN (
+            SELECT album_id FROM relanzamientos
+            WHERE tipoRelanzamiento_id = (
+               SELECT id FROM tiposRelanzamiento WHERE nombre = 'Aniversario' 
+            ) AND YEAR(fechaRelanzamiento) = 2022
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL relanzamientos_AlbumesRelanzadosUniversario2022();
    ```
 
-   ### 5. 
+   ### 5. Encontrar los artistas que han lanzado álbumes tanto en formato físico (vinilo, CD) como en formato digital.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS relanzamientos_ArtistasAlbumesFisicoDigital //
+   CREATE PROCEDURE relanzamientos_ArtistasAlbumesFisicoDigital()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM personas p
+         JOIN albumes a ON p.id = a.artista_id
+         WHERE EXISTS (
+            SELECT * FROM relanzamientos r
+            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id IN (
+               SELECT id FROM tiposRelanzamiento WHERE nombre IN (
+                  'Vinilo de Colección', 'CD', 'Edición Especial', 'Digital Remasterizado'
+               )
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *
+         FROM personas p
+         JOIN albumes a ON p.id = a.artista_id
+         WHERE EXISTS (
+            SELECT * FROM relanzamientos r
+            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id IN (
+               SELECT id FROM tiposRelanzamiento WHERE nombre IN (
+                  'Vinilo de Colección', 'CD', 'Edición Especial', 'Digital Remasterizado'
+               )
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 6. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL relanzamientos_ArtistasAlbumesFisicoDigital();
    ```
 
 - ## ventas
@@ -3015,24 +3106,57 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM ventas WHERE album_id = 1 AND fechaVenta = '2022-03-20';
       ```
 
-   ### 1. 
+   ### 1. Álbumes vendidos por artistas que tienen un nombre artístico y los detalles de las ventas.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_AlbumesArtistasConNombreArtistico //
+   CREATE PROCEDURE ventas_AlbumesArtistasConNombreArtistico()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM (
+            SELECT *
+            FROM ventas
+            WHERE album_id IN (
+               SELECT id
+               FROM albumes
+               WHERE artista_id IN (
+                  SELECT id
+                  FROM personas
+                  WHERE nombreArtistico IS NOT NULL AND tipo = 'artista'
+               )
+            ) ORDER BY album_id
+         ) AS subconsulta
+         JOIN albumes a ON subconsulta.album_id = a.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            a.titulo AS titulo_album,
+            fechaVenta,
+            cantidadVendida,
+            ingresos
+         FROM (
+            SELECT *
+            FROM ventas
+            WHERE album_id IN (
+               SELECT id
+               FROM albumes
+               WHERE artista_id IN (
+                  SELECT id
+                  FROM personas
+                  WHERE nombreArtistico IS NOT NULL AND tipo = 'artista'
+               )
+            ) ORDER BY album_id
+         ) AS subconsulta
+         JOIN albumes a ON subconsulta.album_id = a.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_AlbumesArtistasConNombreArtistico();
    ```
 
    ### 2. 
