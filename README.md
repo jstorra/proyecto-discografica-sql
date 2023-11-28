@@ -2755,7 +2755,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
          ) AS ultima_fecha_relanzamiento
          FROM tiposRelanzamiento tr, relanzamientos r, albumes a
          WHERE tr.id = r.tipoRelanzamiento_id AND r.album_id = a.id
-         GROUP BY ultima_fecha_relanzamiento
+         GROUP BY ultima_fecha_relanzamiento, a.titulo, tr.nombre
          ORDER BY album;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
