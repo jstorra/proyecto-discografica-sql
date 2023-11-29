@@ -2742,7 +2742,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
                   SELECT artista_id FROM albumes WHERE id = ventas.album_id
                )
             ) AS nombre_artista FROM ventas
-            GROUP BY album_id
+            GROUP BY album_id, fechaVenta
             ORDER BY maxIngresos DESC
             LIMIT 1)
          ) AS tabla
@@ -2766,7 +2766,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
                   SELECT artista_id FROM albumes WHERE id = ventas.album_id
             )
          ) AS nombre_artista FROM ventas
-         GROUP BY album_id
+         GROUP BY album_id, fechaVenta
          ORDER BY maxIngresos DESC
          LIMIT 1);
       ELSE
