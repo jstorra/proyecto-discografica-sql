@@ -154,22 +154,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE estudios_ListarEstudiosUnArtista()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
-         WHERE id IN (
-            SELECT DISTINCT estudio_id
-            FROM personas
-            WHERE tipo = 'artista'
+         SELECT COUNT(*) FROM estudios WHERE id IN (
+            SELECT DISTINCT estudio_id FROM personas WHERE tipo = 'artista'
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT id, nombre, ubicacion, fechaFundacion
-         FROM estudios
-         WHERE id IN (
-            SELECT DISTINCT estudio_id
-            FROM personas
-            WHERE tipo = 'artista'
+         SELECT id, nombre, ubicacion, fechaFundacion FROM estudios WHERE id IN (
+            SELECT DISTINCT estudio_id FROM personas WHERE tipo = 'artista'
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -187,22 +179,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE estudios_ListarEstudiosAntesCanada()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
-         WHERE fechaFundacion < (
-            SELECT MIN(fechaFundacion)
-            FROM estudios
-            WHERE ubicacion LIKE '%Canada%'
+         SELECT COUNT(*) FROM estudios WHERE fechaFundacion < (
+            SELECT MIN(fechaFundacion) FROM estudios WHERE ubicacion LIKE '%Canada%'
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT id, nombre, ubicacion, fechaFundacion
-         FROM estudios
-         WHERE fechaFundacion < (
-            SELECT MIN(fechaFundacion)
-            FROM estudios
-            WHERE ubicacion LIKE '%Canada%'
+         SELECT id, nombre, ubicacion, fechaFundacion FROM estudios WHERE fechaFundacion < (
+            SELECT MIN(fechaFundacion) FROM estudios WHERE ubicacion LIKE '%Canada%'
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -220,8 +204,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE estudios_PromedioEdadPersonas()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
+         SELECT COUNT(*) FROM estudios
       );
 
       IF @consulta > 0 THEN
@@ -246,22 +229,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE estudios_EstudiosMayor3Personas()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
-         WHERE id IN (
-            SELECT estudio_id
-            FROM personas
+         SELECT COUNT(*) FROM estudios WHERE id IN (
+            SELECT estudio_id FROM personas
             GROUP BY estudio_id
             HAVING COUNT(*) > 3
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT id, nombre, ubicacion, fechaFundacion
-         FROM estudios
-         WHERE id IN (
-            SELECT estudio_id
-            FROM personas
+         SELECT id, nombre, ubicacion, fechaFundacion FROM estudios WHERE id IN (
+            SELECT estudio_id FROM personas
             GROUP BY estudio_id
             HAVING COUNT(*) > 3
          );
@@ -281,8 +258,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE estudios_CantTipoPersonasEstudios()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
+         SELECT COUNT(*) FROM estudios
       );
 
       IF @consulta > 0 THEN
@@ -310,8 +286,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE estudios_CantPersonasEstudiosUltimos10Anyos()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
+         SELECT COUNT(*) FROM estudios
          WHERE YEAR(fechaFundacion) >= YEAR(CURDATE()) - 10
       );
 
@@ -337,27 +312,11 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
 
       ```SQL
       INSERT INTO personas (
-         sexo,
-         tipo,
-         nombre,
-         apellido1,
-         apellido2,
-         nombreArtistico,
-         telefonoPrincipal,
-         paisOrigen, fechaNacimiento,
-         anyoInicioCarrera,
-         estudio_id
+         sexo, tipo, nombre, apellido1, apellido2, nombreArtistico, telefonoPrincipal, paisOrigen,
+         fechaNacimiento, anyoInicioCarrera, estudio_id
       ) VALUES (
-         'H',
-         'artista',
-         'Juan',
-         'Perez',
-         'Gomez',
-         'Juanito',
-         '+1 555-987-6543',
-         'España',
-         '1990-01-15',
-         2010, 1
+         'H', 'artista', 'Juan', 'Perez', 'Gomez', 'Juanito', '+1 555-987-6543', 'España',
+         '1990-01-15', 2010, 1
       );
       ```
 
@@ -387,17 +346,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE personas_ArtitasEstudiosFundacionDespuesNacimiento()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'artista' AND estudio_id IN (
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND estudio_id IN (
             SELECT id FROM estudios WHERE fechaFundacion > fechaNacimiento
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'artista' AND estudio_id IN (
+         SELECT * FROM personas WHERE tipo = 'artista' AND estudio_id IN (
             SELECT id FROM estudios WHERE fechaFundacion > fechaNacimiento
          );
       ELSE
@@ -416,9 +371,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE personas_IngenierosEstudiosEuropa()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'ingeniero' AND estudio_id IN (
+         SELECT COUNT(*) FROM personas WHERE tipo = 'ingeniero' AND estudio_id IN (
             SELECT id FROM estudios WHERE ubicacion IN (
                SELECT ubicacion FROM estudios WHERE ubicacion RLIKE 'London|Berlin|Paris|Vienna'
             )
@@ -426,9 +379,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'ingeniero' AND estudio_id IN (
+         SELECT * FROM personas WHERE tipo = 'ingeniero' AND estudio_id IN (
             SELECT id FROM estudios WHERE ubicacion IN (
                SELECT ubicacion FROM estudios WHERE ubicacion RLIKE 'London|Berlin|Paris|Vienna'
             )
@@ -449,24 +400,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE personas_Artistas25AnyosYCarreraAntesPrimerEstudio()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'artista'
-         AND YEAR(fechaNacimiento) < 1998
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND YEAR(fechaNacimiento) < 1998
          AND anyoInicioCarrera <= (
-            SELECT MIN(YEAR(fechaFundacion))
-            FROM estudios
+            SELECT MIN(YEAR(fechaFundacion)) FROM estudios
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'artista'
-         AND YEAR(fechaNacimiento) < 1998
+         SELECT * FROM personas WHERE tipo = 'artista' AND YEAR(fechaNacimiento) < 1998
          AND anyoInicioCarrera <= (
-            SELECT MIN(YEAR(fechaFundacion))
-            FROM estudios
+            SELECT MIN(YEAR(fechaFundacion)) FROM estudios
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -484,20 +427,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE personas_ArtistasNoApellido2EstudiosCA()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'artista'
-         AND apellido2 IS NULL
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND apellido2 IS NULL
          AND estudio_id IN (
             SELECT id FROM estudios WHERE ubicacion LIKE '%CA%'
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'artista'
-         AND apellido2 IS NULL
+         SELECT * FROM personas WHERE tipo = 'artista' AND apellido2 IS NULL
          AND estudio_id IN (
             SELECT id FROM estudios WHERE ubicacion LIKE '%CA%'
          );
@@ -517,19 +454,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE personas_CompositoresEstudiosAlmenosUnArtista()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'compositor'
-         AND estudio_id IN (
+         SELECT COUNT(*) FROM personas WHERE tipo = 'compositor' AND estudio_id IN (
             SELECT DISTINCT estudio_id FROM personas WHERE tipo = 'artista'
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'compositor'
-         AND estudio_id IN (
+         SELECT * FROM personas WHERE tipo = 'compositor' AND estudio_id IN (
             SELECT DISTINCT estudio_id FROM personas WHERE tipo = 'artista'
          );
       ELSE
@@ -548,12 +479,9 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE personas_CompositoresTrabajanMasEstudios()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'compositor' AND id IN (
+         SELECT COUNT(*) FROM personas WHERE tipo = 'compositor' AND id IN (
             SELECT id FROM (
-               SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios
-               FROM personas
+               SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios FROM personas
                GROUP BY id
                HAVING num_estudios > 1
             ) AS subconsulta
@@ -561,12 +489,9 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'compositor' AND id IN (
+         SELECT * FROM personas WHERE tipo = 'compositor' AND id IN (
             SELECT id FROM (
-               SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios
-               FROM personas
+               SELECT id, COUNT(DISTINCT estudio_id) AS num_estudios FROM personas
                GROUP BY id
                HAVING num_estudios > 1
             ) AS subconsulta
@@ -615,39 +540,21 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE generos_CompositoresHipHopEstudiosMas2000()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'compositor'
-         AND estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE YEAR(fechaFundacion) > 2000
-         ) AND id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id = (
-               SELECT id FROM generos
-               WHERE nombre = 'Hip Hop'
+         SELECT COUNT(*) FROM personas WHERE tipo = 'compositor' AND estudio_id IN (
+            SELECT id FROM estudios WHERE YEAR(fechaFundacion) > 2000) AND id IN (
+               SELECT persona_id FROM genero_artista_compositor WHERE genero_id = (
+                  SELECT id FROM generos WHERE nombre = 'Hip Hop'
+               )
             )
-         )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'compositor'
-         AND estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE YEAR(fechaFundacion) > 2000
-         ) AND id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id = (
-               SELECT id FROM generos
-               WHERE nombre = 'Hip Hop'
-            )
-         );
+         SELECT * FROM personas WHERE tipo = 'compositor' AND estudio_id IN (
+            SELECT id FROM estudios WHERE YEAR(fechaFundacion) > 2000) AND id IN (
+               SELECT persona_id FROM genero_artista_compositor WHERE genero_id = (
+                  SELECT id FROM generos WHERE nombre = 'Hip Hop'
+               )
+            );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -664,28 +571,18 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE generos_ArtistasGeneroPop()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'artista'
-         AND nombreArtistico IS NOT NULL
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND nombreArtistico IS NOT NULL
          AND id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id = (
+            SELECT persona_id FROM genero_artista_compositor WHERE genero_id = (
                SELECT id FROM generos WHERE nombre = 'Pop'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'artista'
-         AND nombreArtistico IS NOT NULL
+         SELECT * FROM personas WHERE tipo = 'artista' AND nombreArtistico IS NOT NULL
          AND id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id = (
+            SELECT persona_id FROM genero_artista_compositor WHERE genero_id = (
                SELECT id FROM generos WHERE nombre = 'Pop'
             )
          );
@@ -705,12 +602,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE generos_CompositoresMasGeneros()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'compositor'
-         AND id IN (
-            SELECT persona_id
-            FROM (
+         SELECT COUNT(*) FROM personas WHERE tipo = 'compositor' AND id IN (
+            SELECT persona_id FROM (
                SELECT persona_id, COUNT(DISTINCT genero_id) AS num_generos
                FROM genero_artista_compositor
                GROUP BY persona_id
@@ -720,12 +613,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'compositor'
-         AND id IN (
-            SELECT persona_id
-            FROM (
+         SELECT * FROM personas WHERE tipo = 'compositor' AND id IN (
+            SELECT persona_id FROM (
                SELECT persona_id, COUNT(DISTINCT genero_id) AS num_generos
                FROM genero_artista_compositor
                GROUP BY persona_id
@@ -748,29 +637,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE generos_CompositoresNoGeneroClasico()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id != (
-               SELECT id
-               FROM generos
-               WHERE nombre = 'Clásica'
+         SELECT COUNT(*) FROM personas WHERE id IN (
+            SELECT persona_id FROM genero_artista_compositor WHERE genero_id != (
+               SELECT id FROM generos WHERE nombre = 'Clásica'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id != (
-               SELECT id
-               FROM generos
-               WHERE nombre = 'Clásica'
+         SELECT * FROM personas WHERE id IN (
+            SELECT persona_id FROM genero_artista_compositor WHERE genero_id != (
+               SELECT id FROM generos WHERE nombre = 'Clásica'
             )
          );
       ELSE
@@ -789,39 +666,23 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE generos_ArtistasEstudiosOrigenGeneroPop()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = "artista"
-         AND estudio_id IN (
-            SELECT id
-            FROM estudios
+         SELECT COUNT(*) FROM personas WHERE tipo = "artista" AND estudio_id IN (
+            SELECT id FROM estudios
             WHERE ubicacion LIKE CONCAT('%', paisOrigen, '%')
          ) AND id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id = (
-               SELECT id
-               FROM generos
-               WHERE nombre = 'Pop'
+            SELECT persona_id FROM genero_artista_compositor WHERE genero_id = (
+               SELECT id FROM generos WHERE nombre = 'Pop'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = "artista"
-         AND estudio_id IN (
-            SELECT id
-            FROM estudios
+         SELECT * FROM personas WHERE tipo = "artista" AND estudio_id IN (
+            SELECT id FROM estudios
             WHERE ubicacion LIKE CONCAT('%', paisOrigen, '%')
          ) AND id IN (
-            SELECT persona_id
-            FROM genero_artista_compositor
-            WHERE genero_id = (
-               SELECT id
-               FROM generos
-               WHERE nombre = 'Pop'
+            SELECT persona_id FROM genero_artista_compositor WHERE genero_id = (
+               SELECT id FROM generos WHERE nombre = 'Pop'
             )
          );
       ELSE
@@ -873,8 +734,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
                p.nombre,
                TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
                p.tipo
-            FROM genero_artista_compositor gc, personas p
-            WHERE gc.persona_id = p.id
+            FROM genero_artista_compositor gc, personas p WHERE gc.persona_id = p.id
             GROUP BY gc.persona_id
             HAVING COUNT(*) >= 2
          ) AS subconsulta
@@ -885,8 +745,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             p.nombre,
             TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
             p.tipo
-         FROM genero_artista_compositor gc, personas p
-         WHERE gc.persona_id = p.id
+         FROM genero_artista_compositor gc, personas p WHERE gc.persona_id = p.id
          GROUP BY gc.persona_id
          HAVING COUNT(*) >= 2;
       ELSE
@@ -905,15 +764,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE genero_artista_compositor_GenerosArtistasInicioAntes2000()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM genero_artista_compositor gc
+         SELECT COUNT(*) FROM genero_artista_compositor gc
          INNER JOIN personas p ON gc.persona_id = p.id
          WHERE p.tipo = 'artista' AND p.anyoInicioCarrera < 2000
       );
 
       IF @consulta > 0 THEN
-         SELECT DISTINCT gc.genero_id
-         FROM genero_artista_compositor gc
+         SELECT DISTINCT gc.genero_id FROM genero_artista_compositor gc
          INNER JOIN personas p ON gc.persona_id = p.id
          WHERE p.tipo = 'artista' AND p.anyoInicioCarrera < 2000;
       ELSE
@@ -932,15 +789,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE genero_artista_compositor_PersonasRockEstudiosBrazil()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM genero_artista_compositor gc, personas p
-         WHERE gc.genero_id = (
-            SELECT id FROM generos
-            WHERE nombre = 'Rock'
+         SELECT COUNT(*) FROM genero_artista_compositor gc, personas p WHERE gc.genero_id = (
+            SELECT id FROM generos WHERE nombre = 'Rock'
          ) AND p.estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE ubicacion LIKE '%Brazil%'
+            SELECT id FROM estudios WHERE ubicacion LIKE '%Brazil%'
          ) AND gc.persona_id = p.id
       );
 
@@ -949,14 +801,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             p.nombre,
             TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
             p.tipo
-         FROM genero_artista_compositor gc, personas p
-         WHERE gc.genero_id = (
-            SELECT id FROM generos
-            WHERE nombre = 'Rock'
+         FROM genero_artista_compositor gc, personas p WHERE gc.genero_id = (
+            SELECT id FROM generos WHERE nombre = 'Rock'
          ) AND p.estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE ubicacion LIKE '%Brazil%'
+            SELECT id FROM estudios WHERE ubicacion LIKE '%Brazil%'
          ) AND gc.persona_id = p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -975,32 +823,20 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    BEGIN
       SET @consulta = (
          SELECT COUNT(*) FROM (
-            SELECT gc.genero_id, g.nombre
-            FROM genero_artista_compositor gc, generos g, personas p
-            WHERE p.tipo = 'compositor'
-            AND gc.genero_id = g.id
-            AND gc.persona_id = p.id
+            SELECT gc.genero_id, g.nombre FROM genero_artista_compositor gc, generos g, personas p
+            WHERE p.tipo = 'compositor' AND gc.genero_id = g.id AND gc.persona_id = p.id
             AND p.estudio_id IN (
-               SELECT id
-               FROM estudios
-               WHERE YEAR(fechaFundacion) < 2000
-            )
-            GROUP BY gc.genero_id
+               SELECT id FROM estudios WHERE YEAR(fechaFundacion) < 2000
+            ) GROUP BY gc.genero_id
          ) AS subconsulta
       );
 
       IF @consulta > 0 THEN
-         SELECT gc.genero_id, g.nombre
-         FROM genero_artista_compositor gc, generos g, personas p
-         WHERE p.tipo = 'compositor'
-         AND gc.genero_id = g.id
-         AND gc.persona_id = p.id
+         SELECT gc.genero_id, g.nombre FROM genero_artista_compositor gc, generos g, personas p
+         WHERE p.tipo = 'compositor' AND gc.genero_id = g.id AND gc.persona_id = p.id
          AND p.estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE YEAR(fechaFundacion) < 2000
-         )
-         GROUP BY gc.genero_id;
+            SELECT id FROM estudios WHERE YEAR(fechaFundacion) < 2000
+         ) GROUP BY gc.genero_id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -1017,12 +853,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE genero_artista_compositor_PersonasNoGenerosRockPop()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM genero_artista_compositor gc, personas p
-         WHERE gc.genero_id NOT IN (
-            SELECT id
-            FROM generos
-            WHERE nombre IN ('Rock', 'Pop')
+         SELECT COUNT(*) FROM genero_artista_compositor gc, personas p WHERE gc.genero_id NOT IN (
+            SELECT id FROM generos WHERE nombre IN ('Rock', 'Pop')
          ) AND gc.persona_id = p.id
       );
 
@@ -1031,11 +863,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             p.nombre,
             TRIM(CONCAT(p.apellido1, ' ', IFNULL(p.apellido2, ''))) AS apellidos,
             p.tipo
-         FROM genero_artista_compositor gc, personas p
-         WHERE gc.genero_id NOT IN (
-            SELECT id
-            FROM generos
-            WHERE nombre IN ('Rock', 'Pop')
+         FROM genero_artista_compositor gc, personas p WHERE gc.genero_id NOT IN (
+            SELECT id FROM generos WHERE nombre IN ('Rock', 'Pop')
          ) AND gc.persona_id = p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1053,24 +882,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE genero_artista_compositor_GenerosArtistasEstudiosEuropa()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM genero_artista_compositor gc, generos g, personas p
-         WHERE p.tipo = 'artista'
-         AND p.estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE ubicacion RLIKE 'UK|Germany|France|Austria'
+         SELECT COUNT(*) FROM genero_artista_compositor gc, generos g, personas p
+         WHERE p.tipo = 'artista' AND p.estudio_id IN (
+            SELECT id FROM estudios WHERE ubicacion RLIKE 'UK|Germany|France|Austria'
          ) AND gc.genero_id = g.id AND gc.persona_id = p.id
       );
 
       IF @consulta > 0 THEN
-         SELECT DISTINCT gc.genero_id, g.nombre
-         FROM genero_artista_compositor gc, generos g, personas p
-         WHERE p.tipo = 'artista'
-         AND p.estudio_id IN (
-            SELECT id
-            FROM estudios
-            WHERE ubicacion RLIKE 'UK|Germany|France|Austria'
+         SELECT DISTINCT gc.genero_id, g.nombre FROM genero_artista_compositor gc, generos g, personas p
+         WHERE p.tipo = 'artista' AND p.estudio_id IN (
+            SELECT id FROM estudios WHERE ubicacion RLIKE 'UK|Germany|France|Austria'
          ) AND gc.genero_id = g.id AND gc.persona_id = p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1116,24 +937,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializaciones_ArtistasProduccionMusical()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'artista' AND id IN (
-            SELECT DISTINCT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND id IN (
+            SELECT DISTINCT persona_id FROM especializacion_persona WHERE especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas
-         WHERE tipo = 'artista' AND id IN (
-            SELECT DISTINCT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
+         SELECT * FROM personas WHERE tipo = 'artista' AND id IN (
+            SELECT DISTINCT persona_id FROM especializacion_persona WHERE especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
             )
          );
@@ -1153,22 +966,15 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializaciones_Compositores2Especializaciones()
    BEGIN
       SET @consulta = (
-        SELECT COUNT(*)
-         FROM personas p
-         WHERE p.tipo = 'compositor' AND (
-            SELECT COUNT(*) FROM especializacion_persona ep
-            WHERE ep.persona_id = p.id
+        SELECT COUNT(*) FROM personas p WHERE p.tipo = 'compositor' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep WHERE ep.persona_id = p.id
          ) >= 2
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            p.nombre,
-            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
-         FROM personas p
-         WHERE p.tipo = 'compositor' AND (
-            SELECT COUNT(*) FROM especializacion_persona ep
-            WHERE ep.persona_id = p.id
+         SELECT p.nombre, TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
+         FROM personas p WHERE p.tipo = 'compositor' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep WHERE ep.persona_id = p.id
          ) >= 2;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1188,22 +994,15 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       SET @consulta = (
          SELECT COUNT(*)
          FROM personas p, especializacion_persona ep, especializaciones e, estudios es
-         WHERE p.tipo = "compositor"
-         AND p.id = ep.persona_id
-         AND ep.especializacion_id = e.id
-         AND e.nombre = 'Ingeniería de Sonido'
-         AND p.estudio_id = es.id
+         WHERE p.tipo = "compositor" AND p.id = ep.persona_id AND ep.especializacion_id = e.id
+         AND e.nombre = 'Ingeniería de Sonido' AND p.estudio_id = es.id
          AND es.ubicacion LIKE '%Argentina%'
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas p, especializacion_persona ep, especializaciones e, estudios es
-         WHERE p.tipo = 'compositor'
-         AND p.id = ep.persona_id
-         AND ep.especializacion_id = e.id
-         AND e.nombre = 'Ingeniería de Sonido'
-         AND p.estudio_id = es.id
+         SELECT * FROM personas p, especializacion_persona ep, especializaciones e, estudios es
+         WHERE p.tipo = 'compositor' AND p.id = ep.persona_id AND ep.especializacion_id = e.id
+         AND e.nombre = 'Ingeniería de Sonido' AND p.estudio_id = es.id
          AND es.ubicacion LIKE '%Argentina%';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1221,22 +1020,15 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializaciones_Artistas3Especializaciones()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
-         WHERE p.tipo = 'artista' AND (
-            SELECT COUNT(*) FROM especializacion_persona ep
-            WHERE ep.persona_id = p.id
+         SELECT COUNT(*) FROM personas p WHERE p.tipo = 'artista' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep WHERE ep.persona_id = p.id
          ) >= 3
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            p.nombre,
-            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
-         FROM personas p
-         WHERE p.tipo = 'artista' AND (
-            SELECT COUNT(*) FROM especializacion_persona ep
-            WHERE ep.persona_id = p.id
+         SELECT p.nombre, TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
+         FROM personas p WHERE p.tipo = 'artista' AND (
+            SELECT COUNT(*) FROM especializacion_persona ep WHERE ep.persona_id = p.id
          ) >= 3;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1254,11 +1046,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializaciones_CompositoresComposicionEstudiosAntes2000()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE tipo = 'compositor' AND id IN (
-            SELECT ep.persona_id
-            FROM especializacion_persona ep
+         SELECT COUNT(*) FROM personas WHERE tipo = 'compositor' AND id IN (
+            SELECT ep.persona_id FROM especializacion_persona ep
             INNER JOIN personas p ON ep.persona_id = p.id
             INNER JOIN estudios e ON p.estudio_id = e.id
             WHERE ep.especializacion_id = (
@@ -1268,13 +1057,9 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            p.nombre,
-            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
-         FROM personas p
-         WHERE tipo = 'compositor' AND id IN (
-            SELECT ep.persona_id
-            FROM especializacion_persona ep
+         SELECT p.nombre, TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
+         FROM personas p WHERE tipo = 'compositor' AND id IN (
+            SELECT ep.persona_id FROM especializacion_persona ep
             INNER JOIN personas p ON ep.persona_id = p.id
             INNER JOIN estudios e ON p.estudio_id = e.id
             WHERE ep.especializacion_id = (
@@ -1297,26 +1082,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializaciones_ArtistasGestoresNombreArtisticoM()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
-         WHERE p.tipo = 'artista' AND p.id IN (
-            SELECT ep.persona_id
-            FROM especializacion_persona ep
-            WHERE ep.especializacion_id = (
+         SELECT COUNT(*) FROM personas p WHERE p.tipo = 'artista' AND p.id IN (
+            SELECT ep.persona_id FROM especializacion_persona ep WHERE ep.especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Gestión de Derechos de Autor'
             ) AND p.nombreArtistico LIKE 'M%' AND ep.persona_id = p.id
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            p.nombre,
-            TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
-         FROM personas p
-         WHERE p.tipo = 'artista' AND p.id IN (
-            SELECT ep.persona_id
-            FROM especializacion_persona ep
-            WHERE ep.especializacion_id = (
+         SELECT p.nombre, TRIM(CONCAT(p.apellido1,' ', IFNULL(p.apellido2, ''))) AS apellidos
+         FROM personas p WHERE p.tipo = 'artista' AND p.id IN (
+            SELECT ep.persona_id FROM especializacion_persona ep WHERE ep.especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Gestión de Derechos de Autor'
             ) AND p.nombreArtistico LIKE 'M%' AND ep.persona_id = p.id
          );
@@ -1365,26 +1141,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_PersonasProduccionMusical()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
+         SELECT COUNT(*) FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            nombre,
-            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
+         SELECT nombre, TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Producción Musical'
             )
          );
@@ -1404,24 +1171,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_EspecializacionesArtistaSof()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM especializaciones
-         WHERE id IN (
-            SELECT especializacion_id
-            FROM especializacion_persona
-            WHERE persona_id = (
+         SELECT COUNT(*) FROM especializaciones WHERE id IN (
+            SELECT especializacion_id FROM especializacion_persona WHERE persona_id = (
                SELECT id FROM personas WHERE nombreArtistico = 'Sof'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT nombre
-         FROM especializaciones
-         WHERE id IN (
-            SELECT especializacion_id
-            FROM especializacion_persona
-            WHERE persona_id = (
+         SELECT nombre FROM especializaciones WHERE id IN (
+            SELECT especializacion_id FROM especializacion_persona WHERE persona_id = (
                SELECT id FROM personas WHERE nombreArtistico = 'Sof'
             )
          );
@@ -1441,31 +1200,18 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_IngenierosDiseñoDeSonido()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
-               SELECT id
-               FROM especializaciones
-               WHERE nombre = 'Diseño de Sonido'
+         SELECT COUNT(*) FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Diseño de Sonido'
             )
          ) AND tipo = 'ingeniero'
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            nombre,
-            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
-               SELECT id
-               FROM especializaciones
-               WHERE nombre = 'Diseño de Sonido'
+         SELECT nombre, TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
+               SELECT id FROM especializaciones WHERE nombre = 'Diseño de Sonido'
             )
          ) AND tipo = 'ingeniero';
       ELSE
@@ -1484,38 +1230,21 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_PersonasEspecializacionMiguelito()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id IN (
-               SELECT especializacion_id
-               FROM especializacion_persona
-               WHERE persona_id = (
-                  SELECT id
-                     FROM personas
-                     WHERE nombreArtistico = 'Miguelito'
+         SELECT COUNT(*) FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id IN (
+               SELECT especializacion_id FROM especializacion_persona WHERE persona_id = (
+                  SELECT id FROM personas WHERE nombreArtistico = 'Miguelito'
                )
             )
          ) AND nombreArtistico != 'Miguelito'
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            nombre,
-            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id IN (
-               SELECT especializacion_id
-               FROM especializacion_persona
-               WHERE persona_id = (
-                  SELECT id
-                     FROM personas
-                     WHERE nombreArtistico = 'Miguelito'
+         SELECT nombre, TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id IN (
+               SELECT especializacion_id FROM especializacion_persona WHERE persona_id = (
+                  SELECT id FROM personas WHERE nombreArtistico = 'Miguelito'
                )
             )
          ) AND nombreArtistico != 'Miguelito';
@@ -1535,15 +1264,9 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_EstudiosPersonasIngenieriaSonido()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM estudios
-         WHERE id IN (
-            SELECT estudio_id
-            FROM personas
-            WHERE tipo = 'ingeniero' AND id IN (
-               SELECT persona_id
-               FROM especializacion_persona
-               WHERE especializacion_id = (
+         SELECT COUNT(*) FROM estudios WHERE id IN (
+            SELECT estudio_id FROM personas WHERE tipo = 'ingeniero' AND id IN (
+               SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
                   SELECT id FROM especializaciones WHERE nombre = 'Ingeniería de Sonido'
                )
             )
@@ -1551,15 +1274,9 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT nombre
-         FROM estudios
-         WHERE id IN (
-            SELECT estudio_id
-            FROM personas
-            WHERE tipo = 'ingeniero' AND id IN (
-               SELECT persona_id
-               FROM especializacion_persona
-               WHERE especializacion_id = (
+         SELECT nombre FROM estudios WHERE id IN (
+            SELECT estudio_id FROM personas WHERE tipo = 'ingeniero' AND id IN (
+               SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
                   SELECT id FROM especializaciones WHERE nombre = 'Ingeniería de Sonido'
                )
             )
@@ -1580,24 +1297,15 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_PersonasMasEspecializaciones()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
-         WHERE (
-            SELECT COUNT(*)
-            FROM especializacion_persona ep
-            WHERE ep.persona_id = p.id
+         SELECT COUNT(*) FROM personas p WHERE (
+            SELECT COUNT(*) FROM especializacion_persona ep WHERE ep.persona_id = p.id
          ) > 1
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            p.nombre,
-            TRIM(CONCAT(p.apellido1,' ',IFNULL(p.apellido2,''))) AS apellidos
-         FROM personas p
-         WHERE (
-            SELECT COUNT(*)
-            FROM especializacion_persona ep
-            WHERE ep.persona_id = p.id
+         SELECT p.nombre, TRIM(CONCAT(p.apellido1,' ',IFNULL(p.apellido2,''))) AS apellidos
+         FROM personas p WHERE (
+            SELECT COUNT(*) FROM especializacion_persona ep WHERE ep.persona_id = p.id
          ) > 1;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1615,26 +1323,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE especializacion_persona_PersonasComposicionNoArgentina()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
+         SELECT COUNT(*) FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Composición Musical'
             )
          ) AND paisOrigen != 'Argentina'
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            nombre,
-            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2,''))) AS apellidos
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM especializacion_persona
-            WHERE especializacion_id = (
+         SELECT nombre, TRIM(CONCAT(apellido1,' ',IFNULL(apellido2,''))) AS apellidos
+         FROM personas WHERE id IN (
+            SELECT persona_id FROM especializacion_persona WHERE especializacion_id = (
                SELECT id FROM especializaciones WHERE nombre = 'Composición Musical'
             )
          ) AND paisOrigen != 'Argentina';
@@ -1682,16 +1381,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE telefonosPersona_PersonasMismoTelefono()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
+         SELECT COUNT(*) FROM personas p
          JOIN telefonosPersona tp1 ON p.id = tp1.persona_id
          JOIN telefonosPersona tp2 ON tp1.telefono = tp2.telefono
          WHERE tp1.persona_id != tp2.persona_id
       );
 
       IF @consulta > 0 THEN
-         SELECT DISTINCT p.*
-         FROM personas p
+         SELECT DISTINCT p.* FROM personas p
          JOIN telefonosPersona tp1 ON p.id = tp1.persona_id
          JOIN telefonosPersona tp2 ON tp1.telefono = tp2.telefono
          WHERE tp1.persona_id != tp2.persona_id;
@@ -1711,24 +1408,15 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE telefonosPersona_ArtistasTelefono1()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM telefonosPersona
-            WHERE telefono LIKE '+1%'
+         SELECT COUNT(*) FROM personas WHERE id IN (
+            SELECT persona_id FROM telefonosPersona WHERE telefono LIKE '+1%'
          ) AND tipo = 'artista'
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            nombre,
-            TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
-         FROM personas
-         WHERE id IN (
-            SELECT persona_id
-            FROM telefonosPersona
-            WHERE telefono LIKE '+1%'
+         SELECT nombre, TRIM(CONCAT(apellido1,' ',IFNULL(apellido2, ''))) AS apellidos
+         FROM personas WHERE id IN (
+            SELECT persona_id FROM telefonosPersona WHERE telefono LIKE '+1%'
          ) AND tipo = 'artista';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1747,10 +1435,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    BEGIN
       SET @consulta = (
          SELECT COUNT(*) FROM (
-            SELECT p.nombre
-            FROM personas p, telefonosPersona tp
-            WHERE p.nombreArtistico IS NOT NULL
-            AND p.id = tp.persona_id
+            SELECT p.nombre FROM personas p, telefonosPersona tp
+            WHERE p.nombreArtistico IS NOT NULL AND p.id = tp.persona_id
             GROUP BY p.id
          ) AS subconsulta
       );
@@ -1760,8 +1446,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             p.nombre,
             TRIM(CONCAT(p.apellido1,' ',IFNULL(p.apellido2,''))) AS apellidos,
             GROUP_CONCAT(DISTINCT '( ',tp.telefono,' )' SEPARATOR ' - ') AS telefonos_secundarios
-         FROM personas p, telefonosPersona tp
-         WHERE p.nombreArtistico IS NOT NULL
+         FROM personas p, telefonosPersona tp WHERE p.nombreArtistico IS NOT NULL
          AND p.id = tp.persona_id
          GROUP BY p.id;
       ELSE
@@ -1780,9 +1465,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE telefonosPersona_PersonasSegundoTelefono()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p , telefonosPersona tp
-         WHERE p.id = tp.persona_id
+         SELECT COUNT(*) FROM personas p , telefonosPersona tp WHERE p.id = tp.persona_id
       );
 
       IF @consulta > 0 THEN
@@ -1791,8 +1474,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
             TRIM(CONCAT(p.apellido1,' ',IFNULL(apellido2,''))) AS apellidos,
             p.telefonoPrincipal,
             GROUP_CONCAT('( ',tp.telefono,' )' SEPARATOR ' - ') AS otros_telefonos
-         FROM personas p , telefonosPersona tp
-         WHERE p.id = tp.persona_id
+         FROM personas p , telefonosPersona tp WHERE p.id = tp.persona_id
          GROUP BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -1811,16 +1493,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    BEGIN
       SET @consulta = (
          SELECT COUNT(*) FROM (
-            SELECT paisOrigen, COUNT(telefono) AS cantidadTelefonos
-            FROM telefonosPersona
+            SELECT paisOrigen, COUNT(telefono) AS cantidadTelefonos FROM telefonosPersona
             JOIN personas ON telefonosPersona.persona_id = personas.id
             GROUP BY paisOrigen
          ) AS subconsulta
       );
 
       IF @consulta > 0 THEN
-         SELECT paisOrigen, COUNT(telefono) AS cantidadTelefonos
-         FROM telefonosPersona
+         SELECT paisOrigen, COUNT(telefono) AS cantidadTelefonos FROM telefonosPersona
          JOIN personas ON telefonosPersona.persona_id = personas.id
          GROUP BY paisOrigen;
       ELSE
@@ -1868,19 +1548,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE albumes_ArtistasAlbumes2022()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM albumes
-         WHERE YEAR(fechaLanzamiento) = 2022
+         SELECT COUNT(*) FROM albumes WHERE YEAR(fechaLanzamiento) = 2022
       );
 
       IF @consulta > 0 THEN
          SELECT titulo, (
-            SELECT CONCAT(nombre, ' ', apellido1)
-            FROM personas
-            WHERE id = artista_id
+            SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = artista_id
          ) AS artista
-         FROM albumes
-         WHERE YEAR(fechaLanzamiento) = 2022;
+         FROM albumes WHERE YEAR(fechaLanzamiento) = 2022;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -1897,19 +1572,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE albumes_CompositoresAlbumes10añosAntiguo()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM albumes
-         WHERE YEAR(CURDATE()) - YEAR(fechaLanzamiento) > 10
+         SELECT COUNT(*) FROM albumes WHERE YEAR(CURDATE()) - YEAR(fechaLanzamiento) > 10
       );
 
       IF @consulta > 0 THEN
          SELECT titulo, (
-            SELECT CONCAT(nombre, ' ', apellido1)
-            FROM personas
-            WHERE id = artista_id
+            SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = artista_id
          ) AS compositor, CONCAT(YEAR(CURDATE()) - YEAR(fechaLanzamiento),' años') AS antiguedad
-         FROM albumes
-         WHERE YEAR(CURDATE()) - YEAR(fechaLanzamiento) > 10;
+         FROM albumes WHERE YEAR(CURDATE()) - YEAR(fechaLanzamiento) > 10;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -1926,19 +1596,15 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE albumes_AlbumesFebreroYEstudio()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM albumes a
-         WHERE MONTH(fechaLanzamiento) = 2
+         SELECT COUNT(*) FROM albumes a WHERE MONTH(fechaLanzamiento) = 2
       );
 
       IF @consulta > 0 THEN
          SELECT a.titulo, (
-	         SELECT e.nombre
-            FROM estudios e, personas p
+	         SELECT e.nombre FROM estudios e, personas p
             WHERE a.artista_id = p.id AND p.estudio_id = e.id
          ) AS estudio
-         FROM albumes a
-         WHERE MONTH(fechaLanzamiento) = 2;
+         FROM albumes a WHERE MONTH(fechaLanzamiento) = 2;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -1955,23 +1621,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE albumes_AlbumesArtistaUbicacionEstudio()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM albumes a, personas p, estudios e
+         SELECT COUNT(*) FROM albumes a, personas p, estudios e
          WHERE a.artista_id = p.id AND p.estudio_id = e.id
       );
 
       IF @consulta > 0 THEN
          SELECT titulo, (
-            SELECT nombreArtistico
-            FROM personas
-            WHERE id = artista_id
+            SELECT nombreArtistico FROM personas WHERE id = artista_id
          ) AS nombreArtistico, (
-            SELECT ubicacion
-            FROM estudios
-            WHERE id = p.estudio_id
+            SELECT ubicacion FROM estudios WHERE id = p.estudio_id
          ) AS ubicacionEstudio
-         FROM albumes a, personas p, estudios e
-         WHERE a.artista_id = p.id AND p.estudio_id = e.id;
+         FROM albumes a, personas p, estudios e WHERE a.artista_id = p.id AND p.estudio_id = e.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -1988,26 +1648,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE albumes_AlbumesPaisesOrigenArtistasM()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM albumes
-         WHERE (
-            SELECT sexo
-            FROM personas
-            WHERE id = artista_id
+         SELECT COUNT(*) FROM albumes WHERE (
+            SELECT sexo FROM personas WHERE id = artista_id
          ) = 'M'
       );
 
       IF @consulta > 0 THEN
          SELECT titulo, (
-            SELECT paisOrigen
-            FROM personas
-            WHERE id = artista_id
+            SELECT paisOrigen FROM personas WHERE id = artista_id
          ) AS pais
-         FROM albumes
-         WHERE (
-            SELECT sexo
-            FROM personas
-            WHERE id = artista_id
+         FROM albumes WHERE (
+            SELECT sexo FROM personas WHERE id = artista_id
          ) = 'M';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2053,14 +1704,12 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formatos_CantAlbumesFormato()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos
+         SELECT COUNT(*) FROM formatos
       );
 
       IF @consulta > 0 THEN
          SELECT f.nombre, (
-            SELECT COUNT(*) FROM formato_album fa
-            WHERE f.id = fa.formato_id
+            SELECT COUNT(*) FROM formato_album fa WHERE f.id = fa.formato_id
          )  AS cantidad_albumes
          FROM formatos f;
       ELSE
@@ -2079,20 +1728,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formatos_FormatosNoAlbum()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos
-         WHERE id NOT IN (
-            SELECT DISTINCT formato_id
-            FROM formato_album
+         SELECT COUNT(*) FROM formatos WHERE id NOT IN (
+            SELECT DISTINCT formato_id FROM formato_album
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM formatos
-         WHERE id NOT IN (
-            SELECT DISTINCT formato_id
-            FROM formato_album
+         SELECT * FROM formatos WHERE id NOT IN (
+            SELECT DISTINCT formato_id FROM formato_album
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2110,15 +1753,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formatos_FormatoMasUtilizado()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos
-         WHERE (
-            SELECT COUNT(*)
-            FROM formato_album
-            WHERE formatos.id = formato_album.formato_id
+         SELECT COUNT(*) FROM formatos WHERE (
+            SELECT COUNT(*) FROM formato_album WHERE formatos.id = formato_album.formato_id
          ) = (
-            SELECT COUNT(*) FROM formatos f, formato_album fa
-            WHERE f.id = fa.formato_id
+            SELECT COUNT(*) FROM formatos f, formato_album fa WHERE f.id = fa.formato_id
             GROUP BY f.id
             ORDER BY COUNT(*) DESC
             LIMIT 1
@@ -2127,18 +1765,12 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
 
       IF @consulta > 0 THEN
          SELECT *, (
-            SELECT COUNT(*)
-            FROM formato_album
-            WHERE formatos.id = formato_album.formato_id
+            SELECT COUNT(*) FROM formato_album WHERE formatos.id = formato_album.formato_id
          ) AS cantidad_usos
-         FROM formatos
-         WHERE (
-            SELECT COUNT(*)
-            FROM formato_album
-            WHERE formatos.id = formato_album.formato_id
+         FROM formatos WHERE (
+            SELECT COUNT(*) FROM formato_album WHERE formatos.id = formato_album.formato_id
          ) = (
-            SELECT COUNT(*) FROM formatos f, formato_album fa
-            WHERE f.id = fa.formato_id
+            SELECT COUNT(*) FROM formatos f, formato_album fa WHERE f.id = fa.formato_id
             GROUP BY f.id
             ORDER BY COUNT(*) DESC
             LIMIT 1
@@ -2159,18 +1791,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formatos_FormatosUsadosAlbumesAntes2010()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos f, formato_album fa, albumes a
-         WHERE f.id = fa.formato_id
-         AND fa.album_id = a.id
-         AND YEAR(a.fechaLanzamiento) < 2010
+         SELECT COUNT(*) FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id AND fa.album_id = a.id AND YEAR(a.fechaLanzamiento) < 2010
       );
 
       IF @consulta > 0 THEN
          SELECT f.* FROM formatos f, formato_album fa, albumes a
-         WHERE f.id = fa.formato_id
-         AND fa.album_id = a.id
-         AND YEAR(a.fechaLanzamiento) < 2010;
+         WHERE f.id = fa.formato_id AND fa.album_id = a.id AND YEAR(a.fechaLanzamiento) < 2010;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -2187,19 +1814,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formatos_FormatosAlbumesNoPalabraMusica()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos f, formato_album fa, albumes a
-         WHERE f.id = fa.formato_id
-         AND fa.album_id = a.id
-         AND a.titulo NOT LIKE '%Música%'
+         SELECT COUNT(*) FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id AND fa.album_id = a.id AND a.titulo NOT LIKE '%Música%'
       );
 
       IF @consulta > 0 THEN
-         SELECT DISTINCT f.*
-         FROM formatos f, formato_album fa, albumes a
-         WHERE f.id = fa.formato_id
-         AND fa.album_id = a.id
-         AND a.titulo NOT LIKE '%Música%';
+         SELECT DISTINCT f.* FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id AND fa.album_id = a.id AND a.titulo NOT LIKE '%Música%';
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
@@ -2216,20 +1837,14 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formatos_FormatosAlbumesArtista14Año2019()
    BEGIN
       SET @consulta = (
-         SELECT DISTINCT COUNT(*)
-         FROM formatos f, formato_album fa, albumes a
-         WHERE f.id = fa.formato_id
-         AND fa.album_id = a.id
-         AND a.artista_id = 14
+         SELECT DISTINCT COUNT(*) FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id AND fa.album_id = a.id AND a.artista_id = 14
          AND YEAR(a.fechaLanzamiento) = 2019
       );
 
       IF @consulta > 0 THEN
-         SELECT DISTINCT f.*
-         FROM formatos f, formato_album fa, albumes a
-         WHERE f.id = fa.formato_id
-         AND fa.album_id = a.id
-         AND a.artista_id = 14
+         SELECT DISTINCT f.* FROM formatos f, formato_album fa, albumes a
+         WHERE f.id = fa.formato_id AND fa.album_id = a.id AND a.artista_id = 14
          AND YEAR(a.fechaLanzamiento) = 2019;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2275,26 +1890,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formato_album_AlbumesFormatoVinilo()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formato_album
-         WHERE formato_id IN (
-            SELECT id
-            FROM formatos
-            WHERE nombre LIKE 'Vinilo%'
+         SELECT COUNT(*) FROM formato_album WHERE formato_id IN (
+            SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
          )
       );
 
       IF @consulta > 0 THEN
          SELECT DISTINCT album_id, (
-            SELECT titulo
-            FROM albumes
-            WHERE id = album_id
-         ) AS titulo
-         FROM formato_album
-         WHERE formato_id IN (
-            SELECT id
-            FROM formatos
-            WHERE nombre LIKE 'Vinilo%'
+            SELECT titulo FROM albumes WHERE id = album_id
+         ) AS titulo FROM formato_album WHERE formato_id IN (
+            SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2312,24 +1917,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formato_album_FormatosAlbumEspecifico()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos
-         WHERE id IN (
-            SELECT formato_id
-            FROM formato_album
-            WHERE album_id = (
+         SELECT COUNT(*) FROM formatos WHERE id IN (
+            SELECT formato_id FROM formato_album WHERE album_id = (
                SELECT id FROM albumes WHERE titulo = 'Amanecer Musical'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM formatos
-         WHERE id IN (
-            SELECT formato_id
-            FROM formato_album
-            WHERE album_id = (
+         SELECT * FROM formatos WHERE id IN (
+            SELECT formato_id FROM formato_album WHERE album_id = (
                SELECT id FROM albumes WHERE titulo = 'Amanecer Musical'
             )
          );
@@ -2349,14 +1946,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formato_album_AlbumesFormatoCDNoVinilo()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formato_album
-         WHERE formato_id IN (
+         SELECT COUNT(*) FROM formato_album WHERE formato_id IN (
             SELECT id FROM formatos WHERE nombre LIKE 'CD%'
          ) AND album_id NOT IN (
-            SELECT DISTINCT album_id
-            FROM formato_album
-            WHERE formato_id IN (
+            SELECT DISTINCT album_id FROM formato_album WHERE formato_id IN (
                SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
             )
          )
@@ -2364,17 +1957,11 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
 
       IF @consulta > 0 THEN
          SELECT DISTINCT album_id, (
-            SELECT titulo
-            FROM albumes
-            WHERE id = album_id
-         ) AS titulo
-         FROM formato_album
-         WHERE formato_id IN (
+            SELECT titulo FROM albumes WHERE id = album_id
+         ) AS titulo FROM formato_album WHERE formato_id IN (
             SELECT id FROM formatos WHERE nombre LIKE 'CD%'
          ) AND album_id NOT IN (
-            SELECT DISTINCT album_id
-            FROM formato_album
-            WHERE formato_id IN (
+            SELECT DISTINCT album_id FROM formato_album WHERE formato_id IN (
                SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
             )
          );
@@ -2394,34 +1981,20 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formato_album_AlbumesFormatoVinilo2010()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formato_album
-         WHERE formato_id IN (
-            SELECT id
-            FROM formatos
-            WHERE nombre LIKE 'Vinilo%'
+         SELECT COUNT(*) FROM formato_album WHERE formato_id IN (
+            SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
          ) AND album_id IN (
-            SELECT id
-            FROM albumes
-            WHERE fechaLanzamiento < '2010-01-01'
+            SELECT id FROM albumes WHERE fechaLanzamiento < '2010-01-01'
          )
       );
 
       IF @consulta > 0 THEN
          SELECT DISTINCT album_id, (
-            SELECT titulo
-            FROM albumes
-            WHERE id = album_id
-         ) AS titulo
-         FROM formato_album
-         WHERE formato_id IN (
-            SELECT id
-            FROM formatos
-            WHERE nombre LIKE 'Vinilo%'
+            SELECT titulo FROM albumes WHERE id = album_id
+         ) AS titulo FROM formato_album WHERE formato_id IN (
+            SELECT id FROM formatos WHERE nombre LIKE 'Vinilo%'
          ) AND album_id IN (
-            SELECT id
-            FROM albumes
-            WHERE fechaLanzamiento < '2010-01-01'
+            SELECT id FROM albumes WHERE fechaLanzamiento < '2010-01-01'
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2439,29 +2012,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE formato_album_FormatosAlbumesArtista4()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM formatos
-         WHERE id IN (
-            SELECT formato_id
-            FROM formato_album
-            WHERE album_id IN (
-               SELECT id
-               FROM albumes
-               WHERE artista_id = 4
+         SELECT COUNT(*) FROM formatos WHERE id IN (
+            SELECT formato_id FROM formato_album WHERE album_id IN (
+               SELECT id FROM albumes WHERE artista_id = 4
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM formatos
-         WHERE id IN (
-            SELECT formato_id
-            FROM formato_album
-            WHERE album_id IN (
-               SELECT id
-               FROM albumes
-               WHERE artista_id = 4
+         SELECT * FROM formatos WHERE id IN (
+            SELECT formato_id FROM formato_album WHERE album_id IN (
+               SELECT id FROM albumes WHERE artista_id = 4
             )
          );
       ELSE
@@ -2480,12 +2041,9 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
 
       ```SQL
       INSERT INTO canciones (titulo, duracion, letra, album_id, compositor_id)
-      VALUES (
-         'Bohemian Rhapsody',
-         '06:07:00',
+      VALUES ('Bohemian Rhapsody', '06:07:00',
          'Is this the real life. Is this just fantasy. Caught in a landside. No escape from reality.',
-         1,
-         4
+         1, 4
       );
       ```
 
@@ -2515,26 +2073,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE canciones_CancionesCompositoresSonArtistas()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM canciones
-         WHERE compositor_id IN (
-            SELECT id
-            FROM personas
-            WHERE tipo = 'artista'
+         SELECT COUNT(*) FROM canciones WHERE compositor_id IN (
+            SELECT id FROM personas WHERE tipo = 'artista'
          )
       );
 
       IF @consulta > 0 THEN
          SELECT titulo AS cancion, (
-            SELECT CONCAT(nombre, ' ', apellido1)
-            FROM personas WHERE
-            id = canciones.compositor_id
-         ) AS compositor
-         FROM canciones
-         WHERE compositor_id IN (
-            SELECT id
-            FROM personas
-            WHERE tipo = 'artista'
+            SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = canciones.compositor_id
+         ) AS compositor FROM canciones WHERE compositor_id IN (
+            SELECT id FROM personas WHERE tipo = 'artista'
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2552,8 +2100,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE canciones_CancionesEdadCompositorLanzamientoAlbum()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM canciones c, personas p, albumes a
+         SELECT COUNT(*) FROM canciones c, personas p, albumes a
          WHERE p.id = c.compositor_id AND c.album_id = a.id
       );
 
@@ -2582,9 +2129,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE canciones_CancionesYDifEdadesCompoArtista()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM canciones c, albumes a
-         WHERE c.album_id = a.id
+         SELECT COUNT(*) FROM canciones c, albumes a WHERE c.album_id = a.id
       );
 
       IF @consulta > 0 THEN
@@ -2597,8 +2142,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
          ) - (
             SELECT YEAR(fechaNacimiento) FROM personas WHERE id = a.artista_id
          )) AS anios_diferencia
-         FROM canciones c, albumes a
-         WHERE c.album_id = a.id
+         FROM canciones c, albumes a WHERE c.album_id = a.id
          ORDER BY anios_diferencia DESC;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2616,24 +2160,19 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE canciones_CancionesArtistaAlbumHace5Años()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM canciones c, albumes a, personas p
-         WHERE c.album_id = a.id
-         AND a.artista_id = p.id
+         SELECT COUNT(*) FROM canciones c, albumes a, personas p
+         WHERE c.album_id = a.id AND a.artista_id = p.id
          AND YEAR(CURDATE()) - YEAR(a.fechaLanzamiento) > 5
       );
 
       IF @consulta > 0 THEN
          SELECT c.titulo AS cancion, (
-            SELECT TRIM(CONCAT(nombre,' ',apellido1,' ',IFNULL(apellido2,'')))
-            FROM personas
+            SELECT TRIM(CONCAT(nombre,' ',apellido1,' ',IFNULL(apellido2,''))) FROM personas
             WHERE id = c.compositor_id
          ) AS compositor_cancion,
          TRIM(CONCAT(p.nombre,' ',p.apellido1,' ',IFNULL(p.apellido2,''))) AS nombre_artista,
-         p.nombreArtistico AS nombre_artistico
-         FROM canciones c, albumes a, personas p
-         WHERE c.album_id = a.id
-         AND a.artista_id = p.id
+         p.nombreArtistico AS nombre_artistico FROM canciones c, albumes a, personas p
+         WHERE c.album_id = a.id AND a.artista_id = p.id
          AND YEAR(CURDATE()) - YEAR(a.fechaLanzamiento) > 5;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2651,23 +2190,17 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE canciones_CancionesCompositoresCompuestoMasCanciones()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*) FROM canciones
-         WHERE compositor_id IN (
-            SELECT id FROM personas
-            WHERE (
-               SELECT COUNT(*) FROM canciones
-               WHERE personas.id = compositor_id
+         SELECT COUNT(*) FROM canciones WHERE compositor_id IN (
+            SELECT id FROM personas WHERE (
+               SELECT COUNT(*) FROM canciones WHERE personas.id = compositor_id
             ) > 1
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT titulo AS cancion FROM canciones
-         WHERE compositor_id IN (
-            SELECT id FROM personas
-            WHERE (
-               SELECT COUNT(*) FROM canciones
-               WHERE personas.id = compositor_id
+         SELECT titulo AS cancion FROM canciones WHERE compositor_id IN (
+            SELECT id FROM personas WHERE (
+               SELECT COUNT(*) FROM canciones WHERE personas.id = compositor_id
             ) > 1
          );
       ELSE
@@ -2714,15 +2247,12 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE tiposRelanzamiento_CantAlbumesPorTipoRelanzamiento()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM tiposRelanzamiento tr
+         SELECT COUNT(*) FROM tiposRelanzamiento tr
       );
 
       IF @consulta > 0 THEN
          SELECT tr.nombre AS tipo_relanzamiento, (
-            SELECT COUNT(*) 
-            FROM relanzamientos 
-            WHERE tipoRelanzamiento_id = tr.id
+            SELECT COUNT(*) FROM relanzamientos WHERE tipoRelanzamiento_id = tr.id
          ) AS cantidad_albumes
          FROM tiposRelanzamiento tr
          ORDER BY cantidad_albumes DESC;
@@ -2742,16 +2272,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE tiposRelanzamiento_UltimoAlbumPorTipoRelanzamiento()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM tiposRelanzamiento tr, relanzamientos r, albumes a
+         SELECT COUNT(*) FROM tiposRelanzamiento tr, relanzamientos r, albumes a
          WHERE tr.id = r.tipoRelanzamiento_id AND r.album_id = a.id
       );
 
       IF @consulta > 0 THEN
          SELECT a.titulo AS album, tr.nombre AS tipo_relanzamiento, (
-            SELECT MAX(fechaRelanzamiento)
-            FROM relanzamientos
-            WHERE tipoRelanzamiento_id = tr.id
+            SELECT MAX(fechaRelanzamiento) FROM relanzamientos WHERE tipoRelanzamiento_id = tr.id
          ) AS ultima_fecha_relanzamiento
          FROM tiposRelanzamiento tr, relanzamientos r, albumes a
          WHERE tr.id = r.tipoRelanzamiento_id AND r.album_id = a.id
@@ -2773,17 +2300,13 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE tiposRelanzamiento_TipoRelanzamientoConMasAlbumes()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM tiposRelanzamiento tr
+         SELECT COUNT(*) FROM tiposRelanzamiento tr
       );
 
       IF @consulta > 0 THEN
-         SELECT nombre AS tipo_relanzamiento
-         FROM tiposRelanzamiento tr
+         SELECT nombre AS tipo_relanzamiento FROM tiposRelanzamiento tr
          ORDER BY (
-            SELECT COUNT(*) 
-            FROM relanzamientos 
-            WHERE tipoRelanzamiento_id = tr.id
+            SELECT COUNT(*) FROM relanzamientos WHERE tipoRelanzamiento_id = tr.id
          ) DESC
          LIMIT 1;
       ELSE
@@ -2802,11 +2325,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE tiposRelanzamiento_TipoRelanzamientoMayorBrecha()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM tiposRelanzamiento tr
-         WHERE id = (
-            SELECT tipoRelanzamiento_id
-            FROM relanzamientos
+         SELECT COUNT(*) FROM tiposRelanzamiento tr WHERE id = (
+            SELECT tipoRelanzamiento_id FROM relanzamientos
             GROUP BY tipoRelanzamiento_id
             ORDER BY MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) DESC
             LIMIT 1
@@ -2814,11 +2334,8 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT nombre AS tipo_relanzamiento
-         FROM tiposRelanzamiento tr
-         WHERE id = (
-            SELECT tipoRelanzamiento_id
-            FROM relanzamientos
+         SELECT nombre AS tipo_relanzamiento FROM tiposRelanzamiento tr WHERE id = (
+            SELECT tipoRelanzamiento_id FROM relanzamientos
             GROUP BY tipoRelanzamiento_id
             ORDER BY MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) DESC
             LIMIT 1
@@ -2839,22 +2356,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE tiposRelanzamiento_TipoRelanzamiento10años()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM tiposRelanzamiento tr
-         WHERE id IN (
-            SELECT tipoRelanzamiento_id
-            FROM relanzamientos
+         SELECT COUNT(*) FROM tiposRelanzamiento tr WHERE id IN (
+            SELECT tipoRelanzamiento_id FROM relanzamientos
             GROUP BY tipoRelanzamiento_id
             HAVING MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) > 3650
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT nombre AS tipo_relanzamiento
-         FROM tiposRelanzamiento tr
-         WHERE id IN (
-            SELECT tipoRelanzamiento_id
-            FROM relanzamientos
+         SELECT nombre AS tipo_relanzamiento FROM tiposRelanzamiento tr WHERE id IN (
+            SELECT tipoRelanzamiento_id FROM relanzamientos
             GROUP BY tipoRelanzamiento_id
             HAVING MAX(fechaRelanzamiento) - MIN(fechaRelanzamiento) > 3650
          );
@@ -2904,24 +2415,20 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE relanzamientos_ArtistasAlbumesRemasterizados()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
+         SELECT COUNT(*) FROM personas p
          JOIN albumes a ON p.id = a.artista_id
          WHERE EXISTS (
-            SELECT * FROM relanzamientos r
-            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id = (
+            SELECT * FROM relanzamientos r WHERE r.album_id = a.id AND r.tipoRelanzamiento_id = (
                SELECT id FROM tiposRelanzamiento WHERE nombre = 'Remasterizado'
             )
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas p
+         SELECT * FROM personas p
          JOIN albumes a ON p.id = a.artista_id
          WHERE EXISTS (
-            SELECT * FROM relanzamientos r
-            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id = (
+            SELECT * FROM relanzamientos r WHERE r.album_id = a.id AND r.tipoRelanzamiento_id = (
                SELECT id FROM tiposRelanzamiento WHERE nombre = 'Remasterizado'
             )
          );
@@ -2941,24 +2448,18 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE relanzamientos_TiposRelanzamientosAlbumEspecifico()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM tiposRelanzamiento t
+         SELECT COUNT(*) FROM tiposRelanzamiento t
          JOIN relanzamientos r ON t.id = r.tipoRelanzamiento_id
          WHERE r.album_id = (
-            SELECT id
-            FROM albumes
-            WHERE titulo = 'Amanecer Musical'
+            SELECT id FROM albumes WHERE titulo = 'Amanecer Musical'
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT t.nombre AS tipo_relanzamiento
-         FROM tiposRelanzamiento t
+         SELECT t.nombre AS tipo_relanzamiento FROM tiposRelanzamiento t
          JOIN relanzamientos r ON t.id = r.tipoRelanzamiento_id
          WHERE r.album_id = (
-            SELECT id
-            FROM albumes
-            WHERE titulo = 'Amanecer Musical'
+            SELECT id FROM albumes WHERE titulo = 'Amanecer Musical'
          );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
@@ -2976,8 +2477,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE relanzamientos_CantAlbumesArtistaConRelanzados()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
+         SELECT COUNT(*) FROM personas p
          LEFT JOIN albumes a ON p.id = a.artista_id
          LEFT JOIN relanzamientos r ON a.id = r.album_id
       );
@@ -3008,22 +2508,16 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE relanzamientos_AlbumesRelanzadosUniversario2022()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM albumes
-         WHERE id IN (
-            SELECT album_id FROM relanzamientos
-            WHERE tipoRelanzamiento_id = (
+         SELECT COUNT(*) FROM albumes WHERE id IN (
+            SELECT album_id FROM relanzamientos WHERE tipoRelanzamiento_id = (
                SELECT id FROM tiposRelanzamiento WHERE nombre = 'Aniversario' 
             ) AND YEAR(fechaRelanzamiento) = 2022
          )
       );
 
       IF @consulta > 0 THEN
-         SELECT titulo AS titulo_album
-         FROM albumes
-         WHERE id IN (
-            SELECT album_id FROM relanzamientos
-            WHERE tipoRelanzamiento_id = (
+         SELECT titulo AS titulo_album FROM albumes WHERE id IN (
+            SELECT album_id FROM relanzamientos WHERE tipoRelanzamiento_id = (
                SELECT id FROM tiposRelanzamiento WHERE nombre = 'Aniversario' 
             ) AND YEAR(fechaRelanzamiento) = 2022
          );
@@ -3043,12 +2537,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE relanzamientos_ArtistasAlbumesFisicoDigital()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM personas p
+         SELECT COUNT(*) FROM personas p
          JOIN albumes a ON p.id = a.artista_id
          WHERE EXISTS (
-            SELECT * FROM relanzamientos r
-            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id IN (
+            SELECT * FROM relanzamientos r WHERE r.album_id = a.id AND r.tipoRelanzamiento_id IN (
                SELECT id FROM tiposRelanzamiento WHERE nombre IN (
                   'Vinilo de Colección', 'CD', 'Edición Especial', 'Digital Remasterizado'
                )
@@ -3057,12 +2549,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT *
-         FROM personas p
+         SELECT * FROM personas p
          JOIN albumes a ON p.id = a.artista_id
          WHERE EXISTS (
-            SELECT * FROM relanzamientos r
-            WHERE r.album_id = a.id AND r.tipoRelanzamiento_id IN (
+            SELECT * FROM relanzamientos r WHERE r.album_id = a.id AND r.tipoRelanzamiento_id IN (
                SELECT id FROM tiposRelanzamiento WHERE nombre IN (
                   'Vinilo de Colección', 'CD', 'Edición Especial', 'Digital Remasterizado'
                )
@@ -3114,17 +2604,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CREATE PROCEDURE ventas_AlbumesArtistasConNombreArtistico()
    BEGIN
       SET @consulta = (
-         SELECT COUNT(*)
-         FROM (
-            SELECT *
-            FROM ventas
-            WHERE album_id IN (
-               SELECT id
-               FROM albumes
-               WHERE artista_id IN (
-                  SELECT id
-                  FROM personas
-                  WHERE nombreArtistico IS NOT NULL AND tipo = 'artista'
+         SELECT COUNT(*) FROM (
+            SELECT * FROM ventas WHERE album_id IN (
+               SELECT id FROM albumes WHERE artista_id IN (
+                  SELECT id FROM personas WHERE nombreArtistico IS NOT NULL AND tipo = 'artista'
                )
             ) ORDER BY album_id
          ) AS subconsulta
@@ -3132,21 +2615,10 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       );
 
       IF @consulta > 0 THEN
-         SELECT
-            a.titulo AS titulo_album,
-            fechaVenta,
-            cantidadVendida,
-            ingresos
-         FROM (
-            SELECT *
-            FROM ventas
-            WHERE album_id IN (
-               SELECT id
-               FROM albumes
-               WHERE artista_id IN (
-                  SELECT id
-                  FROM personas
-                  WHERE nombreArtistico IS NOT NULL AND tipo = 'artista'
+         SELECT a.titulo AS titulo_album, fechaVenta, cantidadVendida, ingresos FROM (
+            SELECT * FROM ventas WHERE album_id IN (
+               SELECT id FROM albumes WHERE artista_id IN (
+                  SELECT id FROM personas WHERE nombreArtistico IS NOT NULL AND tipo = 'artista'
                )
             ) ORDER BY album_id
          ) AS subconsulta
@@ -3159,124 +2631,212 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    CALL ventas_AlbumesArtistasConNombreArtistico();
    ```
 
-   ### 2. 
+   ### 2. Top 3 de estudios con más ingresos por ventas.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_Top3EstudiosMayoresIngresos //
+   CREATE PROCEDURE ventas_Top3EstudiosMayoresIngresos()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM ventas v
+         INNER JOIN albumes a ON v.album_id = a.id
+         INNER JOIN personas p ON a.artista_id = p.id
+         INNER JOIN estudios e ON p.estudio_id = e.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT e.nombre AS estudio, SUM(v.ingresos) AS totalIngresos FROM ventas v
+         INNER JOIN albumes a ON v.album_id = a.id
+         INNER JOIN personas p ON a.artista_id = p.id
+         INNER JOIN estudios e ON p.estudio_id = e.id
+         GROUP BY estudio
+         ORDER BY totalIngresos DESC
+         LIMIT 3;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_Top3EstudiosMayoresIngresos();
    ```
 
-   ### 3. 
+   ### 3. Artista que ha tenido más ventas en un año específico y su ubicación de estudio
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_ArtistasMayoresVentasPorAñoYSuEstudio //
+   CREATE PROCEDURE ventas_ArtistasMayoresVentasPorAñoYSuEstudio()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM ventas v, albumes a WHERE v.album_id = a.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT 
+            YEAR(v.fechaVenta) AS año, 
+            (SELECT nombre FROM personas WHERE id = a.artista_id) AS artista, 
+            (SELECT ubicacion FROM estudios WHERE id = (
+               SELECT estudio_id FROM personas WHERE id = a.artista_id
+            )) AS ubicacion, MAX(v.cantidadVendida) AS maxCantidadVendida
+         FROM ventas v, albumes a
+         WHERE v.album_id = a.id
+         GROUP BY año, artista, ubicacion;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_ArtistasMayoresVentasPorAñoYSuEstudio();
    ```
 
-   ### 4. 
+   ### 4. Artistas que SI han vendido álbumes con sus nombres y el título de los álbumes.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_ArtistasYSusAlbumesVendidos //
+   CREATE PROCEDURE ventas_ArtistasYSusAlbumesVendidos()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM ventas
       );
 
       IF @consulta > 0 THEN
-
+         SELECT *,
+            (SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = (
+               SELECT artista_id FROM albumes WHERE id = ventas.album_id
+            )) AS nombre_artista,
+            (SELECT titulo FROM albumes WHERE id = ventas.album_id) AS titulo_album
+         FROM ventas;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_ArtistasYSusAlbumesVendidos();
    ```
 
-   ### 5. 
+   ### 5. Álbum más vendido (por cantidad) y álbum más vendido (por ingresos) con información del álbum y artista.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_AlbumMasVendidoPorCantidadYPorIngresos //
+   CREATE PROCEDURE ventas_AlbumMasVendidoPorCantidadYPorIngresos()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM (
+            (SELECT album_id, fechaVenta, cantidadVendida, ingresos, (
+               SELECT titulo FROM albumes WHERE id = ventas.album_id
+            ) AS titulo_album, (
+               SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = (
+                  SELECT artista_id FROM albumes WHERE id = ventas.album_id
+               )
+            ) AS nombre_artista FROM ventas
+            ORDER BY cantidadVendida DESC
+            LIMIT 1)
+            UNION ALL
+            (SELECT album_id, fechaVenta, cantidadVendida, SUM(ingresos) as maxIngresos, (
+               SELECT titulo FROM albumes WHERE id = ventas.album_id
+            ) AS titulo_album, (
+               SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = (
+                  SELECT artista_id FROM albumes WHERE id = ventas.album_id
+               )
+            ) AS nombre_artista FROM ventas
+            GROUP BY album_id
+            ORDER BY maxIngresos DESC
+            LIMIT 1)
+         ) AS tabla
       );
 
       IF @consulta > 0 THEN
-
+         (SELECT album_id, fechaVenta, cantidadVendida, ingresos, (
+            SELECT titulo FROM albumes WHERE id = ventas.album_id
+         ) AS titulo_album, (
+            SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = (
+               SELECT artista_id FROM albumes WHERE id = ventas.album_id
+            )
+         ) AS nombre_artista FROM ventas
+         ORDER BY cantidadVendida DESC
+         LIMIT 1)
+         UNION ALL
+         (SELECT album_id, fechaVenta, cantidadVendida, SUM(ingresos) as maxIngresos, (
+            SELECT titulo FROM albumes WHERE id = ventas.album_id
+            ) AS titulo_album, (
+               SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = (
+                  SELECT artista_id FROM albumes WHERE id = ventas.album_id
+            )
+         ) AS nombre_artista FROM ventas
+         GROUP BY album_id
+         ORDER BY maxIngresos DESC
+         LIMIT 1);
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_AlbumMasVendidoPorCantidadYPorIngresos();
    ```
 
-   ### 6. 
+   ### 6. Artistas que han vendido más de 500 copias en una venta y el total de álbumes vendidos.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_ArtistasMas500CopiasYAlbumesVendidos //
+   CREATE PROCEDURE ventas_ArtistasMas500CopiasYAlbumesVendidos()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM albumes WHERE id IN (
+            SELECT album_id FROM ventas WHERE cantidadVendida > 500
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT artista_id, (
+            SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = artista_id
+         ) AS nombre_artista, COUNT(*) AS total_albumes_vendidos FROM albumes WHERE id IN (
+            SELECT album_id FROM ventas WHERE cantidadVendida > 500
+         ) GROUP BY artista_id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_ArtistasMas500CopiasYAlbumesVendidos();
    ```
 
-   ### 7. 
+   ### 7. Artistas que han vendido álbumes en su país de origen y el título de los álbumes.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS ventas_ArtistasVentasAlbumesPaisOrigen //
+   CREATE PROCEDURE ventas_ArtistasVentasAlbumesPaisOrigen()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas
+         JOIN albumes ON personas.id = albumes.artista_id
+         JOIN ventas ON albumes.id = ventas.album_id
+         WHERE personas.paisOrigen = (
+            SELECT paisOrigen FROM personas WHERE id = albumes.artista_id
+         ) ORDER BY artista_id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT artista_id, (
+            SELECT CONCAT(nombre, ' ', apellido1) FROM personas WHERE id = artista_id
+         ) AS nombre_artista, (
+            SELECT GROUP_CONCAT(titulo) FROM albumes WHERE artista_id = personas.id
+         ) AS titulos_albumes FROM personas
+         JOIN albumes ON personas.id = albumes.artista_id
+         JOIN ventas ON albumes.id = ventas.album_id
+         WHERE personas.paisOrigen = (
+            SELECT paisOrigen FROM personas WHERE id = albumes.artista_id
+         ) ORDER BY artista_id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL ventas_ArtistasVentasAlbumesPaisOrigen();
    ```
 
 - ## giras
@@ -3308,144 +2868,198 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM giras WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Mostrar el nombre de la gira y el nombre del estudio donde trabaja el artista asociado a esa gira.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GiraYNombreEstudioSegunArtista //
+   CREATE PROCEDURE giras_GiraYNombreEstudioSegunArtista()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND p.estudio_id = e.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT g.nombre AS nombre_gira, e.nombre AS nombre_estudio
+         FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND p.estudio_id = e.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GiraYNombreEstudioSegunArtista();
    ```
 
-   ### 2. 
+   ### 2. Mostrar el nombre de la gira y el nombre de los estudios ubicados en el mismo país que el país de origen del artista asociado a esa gira.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GirasEstudiosSegunPaisOrigenArtista //
+   CREATE PROCEDURE giras_GirasEstudiosSegunPaisOrigenArtista()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND e.ubicacion LIKE CONCAT('%', p.paisOrigen, '%')
       );
 
       IF @consulta > 0 THEN
-
+         SELECT g.nombre AS nombre_gira, e.nombre AS nombre_estudio
+         FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND e.ubicacion LIKE CONCAT('%', p.paisOrigen, '%');
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GirasEstudiosSegunPaisOrigenArtista();
    ```
 
-   ### 3. 
+   ### 3. Mostrar el nombre de la gira y el nombre de los estudios fundados en un año impar asociados a esa gira.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GirasYEstudiosFundadosAñoImpar //
+   CREATE PROCEDURE giras_GirasYEstudiosFundadosAñoImpar()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, estudios e WHERE YEAR(e.fechaFundacion) % 2 <> 0
+         AND g.artista_id IN (
+            SELECT id FROM personas WHERE estudio_id = e.id
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT g.nombre AS nombre_gira, e.nombre AS nombre_estudio FROM giras g, estudios e
+         WHERE YEAR(e.fechaFundacion) % 2 <> 0 AND g.artista_id IN (
+            SELECT id FROM personas WHERE estudio_id = e.id
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GirasYEstudiosFundadosAñoImpar();
    ```
 
-   ### 4. 
+   ### 4. Mostrar el nombre de la gira y el nombre de los artistas que tienen más de 30 años, pero que no han realizado giras en América del Norte.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GirasYArtistas30AñosNoGirasAmericaNorte //
+   CREATE PROCEDURE giras_GirasYArtistas30AñosNoGirasAmericaNorte()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, personas p WHERE g.artista_id = p.id
+         AND YEAR(g.fechaInicio) - YEAR(p.fechaNacimiento) > 30 AND NOT EXISTS (
+            SELECT * FROM giras g2
+            WHERE g2.artista_id = p.id AND g2.nombre LIKE '%América del Norte%'
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            g.nombre AS nombre_gira,
+            TRIM(CONCAT(p.nombre,' ',p.apellido1,' ',IFNULL(p.apellido2,''))) AS nombre_artista,
+            p.nombreArtistico
+         FROM giras g, personas p
+         WHERE g.artista_id = p.id AND YEAR(g.fechaInicio) - YEAR(p.fechaNacimiento) > 30
+         AND NOT EXISTS (
+            SELECT * FROM giras g2
+            WHERE g2.artista_id = p.id AND g2.nombre LIKE '%América del Norte%'
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GirasYArtistas30AñosNoGirasAmericaNorte();
    ```
 
-   ### 5. 
+   ### 5. Mostrar el nombre de la gira y el nombre de los artistas que han realizado giras en un año en el que también se fundó un estudio.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GirasYArtistasMismoAñoFundacionEstudio //
+   CREATE PROCEDURE giras_GirasYArtistasMismoAñoFundacionEstudio()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, personas p WHERE g.artista_id = p.id AND EXISTS (
+            SELECT * FROM estudios e WHERE YEAR(g.fechaInicio) = YEAR(e.fechaFundacion)
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            g.nombre AS nombre_gira,
+            TRIM(CONCAT(p.nombre,' ',p.apellido1,' ',IFNULL(p.apellido2,''))) AS nombre_artista,
+            p.nombreArtistico
+         FROM giras g, personas p WHERE g.artista_id = p.id AND EXISTS (
+            SELECT * FROM estudios e WHERE YEAR(g.fechaInicio) = YEAR(e.fechaFundacion)
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GirasYArtistasMismoAñoFundacionEstudio();
    ```
 
-   ### 6. 
+   ### 6. Mostrar el nombre de la gira y el nombre de los estudios fundados en el mismo año que el inicio de la gira, pero en un país diferente al país de origen del artista asociado.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GirasYEstudiosMismoAñoPaisDiferenteSegunArtista //
+   CREATE PROCEDURE giras_GirasYEstudiosMismoAñoPaisDiferenteSegunArtista()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND e.id = p.estudio_id
+         AND YEAR(g.fechaInicio) = YEAR(e.fechaFundacion)
+         AND e.ubicacion != p.paisOrigen
       );
 
       IF @consulta > 0 THEN
-
+         SELECT
+            p.paisOrigen AS pais_artista,
+            e.ubicacion AS ubicacion_estudio,
+            g.nombre AS nombre_gira,
+            e.nombre AS nombre_estudio
+         FROM giras g, estudios e, personas p WHERE g.artista_id = p.id AND e.id = p.estudio_id
+         AND YEAR(g.fechaInicio) = YEAR(e.fechaFundacion) AND e.ubicacion != p.paisOrigen;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GirasYEstudiosMismoAñoPaisDiferenteSegunArtista();
    ```
 
-   ### 7. 
+   ### 7. Mostrar el nombre de la gira y el nombre de los estudios fundados en un año que coincide con el último dígito del año de inicio de carrera del artista asociado a esa gira.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS giras_GirasYEstudiosUltimoDigitoFundacionInicioCarrera //
+   CREATE PROCEDURE giras_GirasYEstudiosUltimoDigitoFundacionInicioCarrera()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND e.id = p.estudio_id
+         AND YEAR(e.fechaFundacion) % 10 = p.anyoInicioCarrera % 10
       );
 
       IF @consulta > 0 THEN
-
+         SELECT g.nombre AS nombre_gira, e.nombre AS nombre_estudio
+         FROM giras g, estudios e, personas p
+         WHERE g.artista_id = p.id AND e.id = p.estudio_id
+         AND YEAR(e.fechaFundacion) % 10 = p.anyoInicioCarrera % 10;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL giras_GirasYEstudiosUltimoDigitoFundacionInicioCarrera();
    ```
 
 - ## paises
@@ -3476,144 +3090,223 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM paises WHERE id = 1;
       ```
 
-   ### 1. 
+   ### 1. Encontrar los países que han sido visitados por al menos dos giras en un mismo año.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_PaisesVisitasDosGirasMismoAño //
+   CREATE PROCEDURE paises_PaisesVisitasDosGirasMismoAño()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM paises, pais_gira, giras
+         WHERE paises.id = pais_gira.pais_id AND pais_gira.gira_id = giras.id
+         GROUP BY paises.id, YEAR(giras.fechaInicio)
+         HAVING COUNT(DISTINCT giras.id) >= 2
       );
 
       IF @consulta > 0 THEN
-
+         SELECT paises.nombre AS nombre_pais FROM paises, pais_gira, giras
+         WHERE paises.id = pais_gira.pais_id AND pais_gira.gira_id = giras.id
+         GROUP BY paises.id, YEAR(giras.fechaInicio)
+         HAVING COUNT(DISTINCT giras.id) >= 2;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_PaisesVisitasDosGirasMismoAño();
    ```
 
-   ### 2. 
+   ### 2. Artistas que han nacido en países que no han sido visitados por ninguna gira.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_ArtistasPaisOrigenNoVisitadoGira //
+   CREATE PROCEDURE paises_ArtistasPaisOrigenNoVisitadoGira()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND paisOrigen NOT IN (
+            SELECT DISTINCT paises.nombre FROM paises, pais_gira
+            WHERE paises.id = pais_gira.pais_id
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT * FROM personas WHERE tipo = 'artista' AND paisOrigen NOT IN (
+            SELECT DISTINCT paises.nombre FROM paises, pais_gira
+            WHERE paises.id = pais_gira.pais_id
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_ArtistasPaisOrigenNoVisitadoGira();
    ```
 
-   ### 3. 
+   ### 3. Listar los artistas que han nacido en países que han sido visitados por al menos dos giras diferentes.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_ArtistasPaisesVisitados2Giras //
+   CREATE PROCEDURE paises_ArtistasPaisesVisitados2Giras()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas WHERE tipo = 'artista' AND paisOrigen IN (
+            SELECT pais_id FROM pais_gira
+            GROUP BY pais_id
+            HAVING COUNT(DISTINCT gira_id) >= 2
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT * FROM personas WHERE tipo = 'artista' AND paisOrigen IN (
+            SELECT pais_id FROM pais_gira
+            GROUP BY pais_id
+            HAVING COUNT(DISTINCT gira_id) >= 2
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_ArtistasPaisesVisitados2Giras();
    ```
 
-   ### 4. 
+   ### 4. Listar los países que han sido visitados por giras que incluyen artistas que han nacido en países de América del Sur y compositores que han nacido en países de Europa.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_PaisesVisitadosGirasArtistasAmericaCompEuropa //
+   CREATE PROCEDURE paises_PaisesVisitadosGirasArtistasAmericaCompEuropa()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM paises, pais_gira, giras, personas
+         WHERE paises.id = pais_gira.pais_id AND pais_gira.gira_id = giras.id
+         AND giras.artista_id = personas.id AND (
+            (personas.paisOrigen IN (
+                  'Argentina', 'Colombia', 'Perú', 'Chile', 'Ecuador', 'Venezuela'
+               ) AND personas.tipo = 'artista'
+            ) OR (personas.paisOrigen IN (
+                  'Reino Unido', 'Alemania', 'Suecia', 'Francia', 'Italia', 'España', 'Austria'
+               ) AND personas.tipo = 'compositor'
+            )
+         ) ORDER BY paises.id
       );
 
       IF @consulta > 0 THEN
-
+         SELECT paises.* FROM paises, pais_gira, giras, personas
+         WHERE paises.id = pais_gira.pais_id AND pais_gira.gira_id = giras.id
+         AND giras.artista_id = personas.id AND (
+            (personas.paisOrigen IN (
+                  'Argentina', 'Colombia', 'Perú', 'Chile', 'Ecuador', 'Venezuela'
+               ) AND personas.tipo = 'artista'
+            ) OR (personas.paisOrigen IN (
+                  'Reino Unido', 'Alemania', 'Suecia', 'Francia', 'Italia', 'España', 'Austria'
+               ) AND personas.tipo = 'compositor'
+            )
+         ) ORDER BY paises.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_PaisesVisitadosGirasArtistasAmericaCompEuropa();
    ```
 
-   ### 5. 
+   ### 5. Encontrar los estudios que han sido utilizados por artistas que han nacido en países que no han sido visitados por ninguna gira.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_EstudiosArtistasPaisOrigenNoVisitadoGira //
+   CREATE PROCEDURE paises_EstudiosArtistasPaisOrigenNoVisitadoGira()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM estudios, personas
+         WHERE estudios.id = personas.estudio_id AND personas.tipo = 'artista'
+         AND personas.paisOrigen NOT IN (
+            SELECT DISTINCT paises.nombre FROM paises, pais_gira
+            WHERE paises.id = pais_gira.pais_id
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT estudios.* FROM estudios, personas
+         WHERE estudios.id = personas.estudio_id AND personas.tipo = 'artista'
+         AND personas.paisOrigen NOT IN (
+            SELECT DISTINCT paises.nombre FROM paises, pais_gira
+            WHERE paises.id = pais_gira.pais_id
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_EstudiosArtistasPaisOrigenNoVisitadoGira();
    ```
 
-   ### 6. 
+   ### 6. Listar los países que han sido visitados por giras que incluyen artistas de estudios fundados antes del año 2000 y compositores de estudios fundados después del año 2000.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_PaisesVisitadosArtsYCompsEstudiosAntes2000 //
+   CREATE PROCEDURE paises_PaisesVisitadosArtsYCompsEstudiosAntes2000()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM paises, pais_gira, giras, personas, estudios
+         WHERE paises.id = pais_gira.pais_id AND pais_gira.gira_id = giras.id
+         AND giras.artista_id = personas.id AND personas.tipo IN ('artista', 'compositor')
+         AND personas.estudio_id = estudios.id AND (
+            (personas.tipo = 'artista' AND YEAR(estudios.fechaFundacion) < 2000)
+            OR
+            (personas.tipo = 'compositor' AND YEAR(estudios.fechaFundacion) < 2000)
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT paises.* FROM paises, pais_gira, giras, personas, estudios
+         WHERE paises.id = pais_gira.pais_id AND pais_gira.gira_id = giras.id
+         AND giras.artista_id = personas.id AND personas.tipo IN ('artista', 'compositor')
+         AND personas.estudio_id = estudios.id AND (
+            (personas.tipo = 'artista' AND YEAR(estudios.fechaFundacion) < 2000)
+            OR
+            (personas.tipo = 'compositor' AND YEAR(estudios.fechaFundacion) < 2000)
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_PaisesVisitadosArtsYCompsEstudiosAntes2000();
    ```
 
-   ### 7. 
+   ### 7. Personas que han trabajado en estudios ubicados en países que han sido visitados por al menos tres giras diferentes en un año específico.
+
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS paises_PersonasEstudiosUbicacionVisitados3GirasAño //
+   CREATE PROCEDURE paises_PersonasEstudiosUbicacionVisitados3GirasAño()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas, estudios, pais_gira, giras, paises
+         WHERE personas.estudio_id = estudios.id AND personas.id = giras.artista_id
+         AND giras.id = pais_gira.gira_id AND pais_gira.pais_id = paises.id
+         GROUP BY personas.id, YEAR(giras.fechaInicio)
+         HAVING COUNT(DISTINCT pais_gira.gira_id) >= 3
       );
 
       IF @consulta > 0 THEN
-
+         SELECT personas.* FROM personas, estudios, pais_gira, giras, paises
+         WHERE personas.estudio_id = estudios.id AND personas.id = giras.artista_id
+         AND giras.id = pais_gira.gira_id AND pais_gira.pais_id = paises.id
+         GROUP BY personas.id, YEAR(giras.fechaInicio)
+         HAVING COUNT(DISTINCT pais_gira.gira_id) >= 3;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL paises_PersonasEstudiosUbicacionVisitados3GirasAño();
    ```
 
 - ## pais_gira
@@ -3645,6 +3338,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       ```
 
    ### 1. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -3665,6 +3359,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 2. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -3685,6 +3380,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 3. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -3705,6 +3401,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 4. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -3725,6 +3422,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 5. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -3745,6 +3443,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 6. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
@@ -3765,6 +3464,7 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
    ```
 
    ### 7. 
+
    ```SQL
    DELIMITER //
    DROP PROCEDURE IF EXISTS  //
