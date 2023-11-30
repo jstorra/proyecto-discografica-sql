@@ -3337,151 +3337,239 @@ Este sistema de gestión permitirá a la discográfica mantener un control efect
       DELETE FROM pais_gira WHERE gira_id = 1 AND pais_id = 3;
       ```
 
-   ### 1. 
+   ### 1. Obtener información de los artistas que han tenido giras en países que no han sido visitados en el año 2022.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS pais_gira_InfoArtistasGirasPaisesNoVisitados2022 //
+   CREATE PROCEDURE pais_gira_InfoArtistasGirasPaisesNoVisitados2022()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas p
+         JOIN giras g ON p.id = g.artista_id
+         JOIN pais_gira pg ON g.id = pg.gira_id
+         JOIN paises pa ON pg.pais_id = pa.id
+         WHERE pg.pais_id NOT IN (
+            SELECT DISTINCT pais_id FROM pais_gira WHERE gira_id IN (
+               SELECT id FROM giras WHERE YEAR(fechaInicio) = 2022
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT TRIM(
+            CONCAT(p.nombre,' ',p.apellido1,' ',IFNULL(p.apellido2, ''))
+         ) AS nombre_completo_artista, p.telefonoPrincipal AS telefeno_artista, GROUP_CONCAT(
+            DISTINCT pa.nombre SEPARATOR ', '
+         ) AS paises
+         FROM personas p
+         JOIN giras g ON p.id = g.artista_id
+         JOIN pais_gira pg ON g.id = pg.gira_id
+         JOIN paises pa ON pg.pais_id = pa.id
+         WHERE pg.pais_id NOT IN (
+            SELECT DISTINCT pais_id FROM pais_gira WHERE gira_id IN (
+               SELECT id FROM giras WHERE YEAR(fechaInicio) = 2022
+            )
+         ) GROUP BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL pais_gira_InfoArtistasGirasPaisesNoVisitados2022();
    ```
 
-   ### 2. 
+   ### 2. Listar los artistas que han tenido giras en países cuyos nombres tengan más de una palabra.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS pais_gira_ArtistasGirasPaisesNombreMasPalabras //
+   CREATE PROCEDURE pais_gira_ArtistasGirasPaisesNombreMasPalabras()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas p WHERE p.id IN (
+            SELECT g.artista_id FROM giras g WHERE g.id IN (
+               SELECT pg.gira_id FROM pais_gira pg WHERE pg.pais_id IN (
+                  SELECT pais.id FROM paises pais
+                  WHERE LENGTH(pais.nombre) - LENGTH(REPLACE(pais.nombre, ' ', '')) > 0
+               )
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT p.* FROM personas p WHERE p.id IN (
+            SELECT g.artista_id FROM giras g WHERE g.id IN (
+               SELECT pg.gira_id FROM pais_gira pg WHERE pg.pais_id IN (
+                  SELECT pais.id FROM paises pais
+                  WHERE LENGTH(pais.nombre) - LENGTH(REPLACE(pais.nombre, ' ', '')) > 0
+               )
+            )
+         ) ORDER BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL pais_gira_ArtistasGirasPaisesNombreMasPalabras();
    ```
 
-   ### 3. 
+   ### 3. Obtener los estudios que han sido parte de giras en países que han sido visitados en giras que duraron más de 60 días.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS pais_gira_EstudiosGirasPaisesVisitadosDuracion60Dias //
+   CREATE PROCEDURE pais_gira_EstudiosGirasPaisesVisitadosDuracion60Dias()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM estudios e WHERE e.id IN (
+            SELECT p.estudio_id FROM personas p WHERE p.id IN (
+               SELECT g.artista_id FROM giras g WHERE g.id IN (
+                  SELECT pg.gira_id FROM pais_gira pg
+               ) AND DATEDIFF(g.fechaFin, g.fechaInicio) > 60
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT e.* FROM estudios e WHERE e.id IN (
+            SELECT p.estudio_id FROM personas p WHERE p.id IN (
+               SELECT g.artista_id FROM giras g WHERE g.id IN (
+                  SELECT pg.gira_id FROM pais_gira pg
+               ) AND DATEDIFF(g.fechaFin, g.fechaInicio) > 60
+            )
+         ) ORDER BY e.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL pais_gira_EstudiosGirasPaisesVisitadosDuracion60Dias();
    ```
 
-   ### 4. 
+   ### 4. Lista los estudios que han sido parte de giras en países que tienen una 'a' en la primera mitad del nombre y una 'e' en la segunda mitad.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS pais_gira_EstudiosGirasPaises1MitadAY2MitadE //
+   CREATE PROCEDURE pais_gira_EstudiosGirasPaises1MitadAY2MitadE()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM estudios e WHERE e.id IN (
+            SELECT p.estudio_id FROM personas p WHERE p.id IN (
+               SELECT g.artista_id FROM giras g WHERE g.id IN (
+                  SELECT pg.gira_id FROM pais_gira pg WHERE pais_id IN (
+                     SELECT pa.id FROM paises pa
+                     WHERE SUBSTRING(pa.nombre, 1, LENGTH(pa.nombre) / 2) LIKE '%a%'
+                     AND SUBSTRING(
+                           pa.nombre, LENGTH(pa.nombre) / 2 + 1, LENGTH(pa.nombre) / 2
+                     ) LIKE '%e%'
+                  )
+               )
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT e.* FROM estudios e WHERE e.id IN (
+            SELECT p.estudio_id FROM personas p WHERE p.id IN (
+               SELECT g.artista_id FROM giras g WHERE g.id IN (
+                  SELECT pg.gira_id FROM pais_gira pg WHERE pais_id IN (
+                     SELECT pa.id FROM paises pa
+                     WHERE SUBSTRING(pa.nombre, 1, LENGTH(pa.nombre) / 2) LIKE '%a%'
+                     AND SUBSTRING(
+                           pa.nombre, LENGTH(pa.nombre) / 2 + 1, LENGTH(pa.nombre) / 2
+                     ) LIKE '%e%'
+                  )
+               )
+            )
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL pais_gira_EstudiosGirasPaises1MitadAY2MitadE();
    ```
 
-   ### 5. 
+   ### 5. Obtener los nombres de los artistas que han tenido giras en países cuya cantidad de letras es un número primo, mostrando ademas el pais con su longitud.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS pais_gira_ArtistasGirasPaisesCantLetrasNumPrimo //
+   CREATE PROCEDURE pais_gira_ArtistasGirasPaisesCantLetrasNumPrimo()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*) FROM personas p, giras g, pais_gira pg, paises pais
+         WHERE p.id = g.artista_id AND g.id = pg.gira_id AND pg.pais_id = pais.id
+         AND LENGTH(pais.nombre) IN (
+            SELECT DISTINCT LENGTH(nombre) FROM paises WHERE LENGTH(nombre) IN (
+               2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31
+            )
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT TRIM(
+            CONCAT(p.nombre,' ',p.apellido1,' ',IFNULL(p.apellido2, ''))
+         ) AS nombre_completo_artista, CONCAT(
+            GROUP_CONCAT(DISTINCT CONCAT(pais.nombre,' (',LENGTH(pais.nombre),')') SEPARATOR ', ')
+         ) AS paises_y_longitud
+         FROM personas p, giras g, pais_gira pg, paises pais
+         WHERE p.id = g.artista_id AND g.id = pg.gira_id AND pg.pais_id = pais.id
+         AND LENGTH(pais.nombre) IN (
+            SELECT DISTINCT LENGTH(nombre) FROM paises WHERE LENGTH(nombre) IN (
+               2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31
+            )
+         ) GROUP BY p.id;
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
+   CALL pais_gira_ArtistasGirasPaisesCantLetrasNumPrimo();
    ```
 
-   ### 6. 
+   ### 6. Obtener los nombres de los estudios que han sido parte de giras en países cuya longitud del nombre multiplicada por 200 es mayor o igual a la suma de los años de inicio de carrera de los artistas en ese estudio, mostrar tambien el nombre del pais con su longitud, la nueva longitud multiplicada y por ultimo la suma de todos los años de inicio de carrera de los artistas.
 
    ```SQL
    DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
+   DROP PROCEDURE IF EXISTS pais_gira_EstudiosGirasLongitudNombreMayorIgualSumaAños //
+   CREATE PROCEDURE pais_gira_EstudiosGirasLongitudNombreMayorIgualSumaAños()
    BEGIN
       SET @consulta = (
-         
+         SELECT COUNT(*)
+         FROM estudios e, personas p, giras g, pais_gira pg, paises pa
+         WHERE e.id = p.estudio_id
+         AND p.id = g.artista_id
+         AND g.id = pg.gira_id
+         AND pg.pais_id = pa.id
+         AND LENGTH(pa.nombre) * 200 >= (
+            SELECT SUM(anyoInicioCarrera) FROM personas WHERE estudio_id = e.id
+         )
       );
 
       IF @consulta > 0 THEN
-
+         SELECT DISTINCT
+            e.nombre AS nombre_estudio,
+            CONCAT(pa.nombre,' (',LENGTH(pa.nombre),')') AS nombre_pais,
+            LENGTH(pa.nombre) * 200 AS nueva_longitud, (
+               SELECT SUM(anyoInicioCarrera) FROM personas WHERE estudio_id = e.id
+            ) AS suma_años
+         FROM estudios e, personas p, giras g, pais_gira pg, paises pa
+         WHERE e.id = p.estudio_id
+         AND p.id = g.artista_id
+         AND g.id = pg.gira_id
+         AND pg.pais_id = pa.id
+         AND LENGTH(pa.nombre) * 200 >= (
+            SELECT SUM(anyoInicioCarrera) FROM personas WHERE estudio_id = e.id
+         );
       ELSE
          SELECT 'No hay resultados para mostrar.' AS MENSAJE;
       END IF;
    END //
    DELIMITER ;
-   CALL ();
-   ```
-
-   ### 7. 
-
-   ```SQL
-   DELIMITER //
-   DROP PROCEDURE IF EXISTS  //
-   CREATE PROCEDURE ()
-   BEGIN
-      SET @consulta = (
-         
-      );
-
-      IF @consulta > 0 THEN
-
-      ELSE
-         SELECT 'No hay resultados para mostrar.' AS MENSAJE;
-      END IF;
-   END //
-   DELIMITER ;
-   CALL ();
+   CALL pais_gira_EstudiosGirasLongitudNombreMayorIgualSumaAños();
    ```
 
 ## Modelos
